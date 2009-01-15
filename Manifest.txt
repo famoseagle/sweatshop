@@ -1,0 +1,7 @@
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/wurque
+lib/wurque.rb
+test/test_wurque.rb
