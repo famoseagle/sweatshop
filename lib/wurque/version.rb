@@ -1,4 +1,4 @@
-module Wurque #:nodoc:
+class Wurque #:nodoc:
   module VERSION #:nodoc:
     MAJOR = 0
     MINOR = 1

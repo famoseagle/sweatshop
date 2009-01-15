@@ -2,9 +2,6 @@ require 'rubygems'
 require 'mq'
 require 'digest'
 
-load_path = File.expand_path(File.join(RAILS_ROOT, 'app', 'workers'))
-Dir.glob("#{load_path}/**/*.rb").each{|worker| require worker }
-
 def metaclass; class << self; self; end; end
 def meta_eval &blk; metaclass.instance_eval &blk; end
 def meta_def name, &blk
@@ -14,9 +11,11 @@ end
 class Wurque
   cattr_accessor :workers, :em_thread
 
-  @@workers   = []
-  @@mq        = nil
-  @@em_thread = nil
+  @@workers      = []
+  @@mq           = nil
+  @@em_thread    = nil
+  @@before_tasks = {}
+  @@after_tasks  = {}
 
   class << self
     def inherited(subclass)
@@ -50,10 +49,10 @@ class Wurque
       @queue_name ||= self.to_s.dasherize
     end
 
-    def complete_tasks(group=nil)
+    def complete_tasks(workers=[])
       EM.run do
-        if group
-          workers_in_group(group).each do |worker|
+        if workers.any?
+          workers.uniq.each do |worker|
             subscribe(worker)
           end
         else
@@ -66,29 +65,34 @@ class Wurque
       instance = worker.new
       mq.queue(worker.queue_name).subscribe do |data|
         data = Marshal.load(data)
-        @before_task.call(data) if @before_task
+        @@before_tasks[worker].call(data) if @@before_tasks[worker]
         logger.debug("Dequeuing #{data[:method]}")
         data[:result] = instance.send(data[:method], *data[:args]) 
-        @after_task.call(data) if @after_task
+        @@after_tasks[worker].call(data) if @@after_tasks[worker]
       end
     end
 
-    def workers_in_group(group)
-      if group == :all
+    def workers_in_groups(groups)
+      groups = [groups] unless groups.is_a?(Array)
+      if groups.include?(:all)
         workers
       else
         workers.select do |worker|
-          worker.queue_group == group
+          groups.include?(worker.queue_group)
         end
       end
     end
 
     def complete_all_tasks
-      complete_tasks(:all)
+      complete_tasks(
+        workers_in_groups(:all)
+      )
     end
 
     def complete_default_tasks
-      complete_tasks(:default)
+      complete_tasks(
+        workers_in_groups(:default)
+      )
     end
 
     def logger
@@ -96,11 +100,11 @@ class Wurque
     end
 
     def before_task(&block)
-      @before_task = block
+      @@before_tasks[self] = block
     end
 
     def after_task(&block)
-      @after_task = block
+      @@after_tasks[self] = block
     end
 
     def queue_group(group=nil)
@@ -119,3 +123,6 @@ Signal.trap('TERM') do
   AMQP.stop{ EM.stop } 
   Wurque.cleanup
 end
+
+load_path = File.expand_path(File.join(RAILS_ROOT, 'app', 'workers'))
+Dir.glob("#{load_path}/**/*.rb").each{|worker| require worker }
