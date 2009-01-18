@@ -1,17 +1,11 @@
 require 'rubygems'
 require 'mq'
 require 'digest'
-require '/../../i_can_daemonize/lib/i_can_daemonize' #fixme
 
 $:.unshift(File.dirname(__FILE__))
 require 'sweat_shop/metaid'
 require 'sweat_shop/worker'
 require 'sweat_shop/version'
-
-if defined?(RAILS_ROOT)
-  load_path = File.expand_path(File.join(RAILS_ROOT, 'app', 'workers'))
-  Dir.glob("#{load_path}/**/*.rb").each{|worker| require worker }
-end
 
 module SweatShop
   extend self
