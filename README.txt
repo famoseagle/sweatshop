@@ -4,9 +4,8 @@
 
 == DESCRIPTION:
 
-Wurque is a fork of Workling designed to work in environments outside of
-EventMachine like Passenger and script/console. It follows the same pattern as
-Workling with a few tweaks.
+Sweatshop is a fork of Workling designed to work in environments outside of EventMachine like Passenger. 
+It follows the same pattern as Workling with a few tweaks.
 
 == FEATURES/PROBLEMS:
 
@@ -17,6 +16,7 @@ Workling with a few tweaks.
 == REQUIREMENTS:
 
 * amq
+* i_can_daemonize
 
 == INSTALL:
 

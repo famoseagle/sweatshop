@@ -2,11 +2,10 @@
 
 require 'rubygems'
 require 'hoe'
-require './lib/wurque.rb'
+require './lib/sweat_shop.rb'
 
-Hoe.new('wurque', Wurque::VERSION) do |p|
-  # p.rubyforge_name = 'wurquex' # if different than lowercase project name
-  # p.developer('FIX', 'FIX@example.com')
+Hoe.new('sweat_shop', SweatShop::VERSION::STRING) do |p|
+   p.developer('Amos Elliston', 'famoseagle@gmail.com')
 end
 
 # vim: syntax=Ruby
