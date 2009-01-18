@@ -1,4 +1,4 @@
-= sweat-shop
+= sweat_shop
 
 == DESCRIPTION:
 
@@ -9,7 +9,7 @@ rabbitmq/ampq. Inspired by Workling, it follows some of the same patterns with a
 
 * async message passing through amq
 * ability to group workers into specific queues
-* can work on webservers not running EventMachine like Passenger
+* can work on web servers not running EventMachine (like Passenger)
 
 == SYNOPSIS:
 
