@@ -16,12 +16,12 @@ module SweatShop
           raise ArgumentError.new("#{method} expects #{expected_args} arguments")
         end
 
-        uid     = ::Digest::MD5.hexdigest("#{self.name}:#{method}:#{args}:#{Time.now.to_f}")
-        payload = Marshal.dump({:args => args, :method => method, :uid => uid})
+        uid  = ::Digest::MD5.hexdigest("#{self.name}:#{method}:#{args}:#{Time.now.to_f}")
+        task = Marshal.dump({:args => args, :method => method, :uid => uid})
         log("Putting #{uid} on #{queue_name}")
 
         self.em_thread = Thread.new{EM.run} if em_thread.nil? and not EM.reactor_running?
-        mq.queue(queue_name).publish(payload, :durable => true)
+        mq.queue(queue_name).publish(task, :durable => true)
         uid
       elsif instance.respond_to?(method)
         instance.send(method, *args)
@@ -50,8 +50,8 @@ module SweatShop
 
     def self.complete_tasks
       EM.run do
-        mq.queue(queue_name).subscribe do |payload|
-          task = Marshal.load(payload)
+        mq.queue(queue_name).subscribe do |task|
+          task = Marshal.load(task)
           before_task.call(task) if before_task
           log("Dequeuing #{task[:method]}")
           task[:result] = instance.send(task[:method], *task[:args]) 
