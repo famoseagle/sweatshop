@@ -1,15 +1,15 @@
-= wurque
-
-* FIX (url)
+= sweat-shop
 
 == DESCRIPTION:
 
-Sweatshop is a fork of Workling designed to work in environments outside of EventMachine like Passenger. 
-It follows the same pattern as Workling with a few tweaks.
+Sweatshop is as simple asynchronous worker queue built on top of
+rabbitmq/ampq. Inspired by Workling, it follows some of the same patterns with a few tweaks.
 
 == FEATURES/PROBLEMS:
 
 * async message passing through amq
+* ability to group workers into specific queues
+* can work on webservers not running EventMachine like Passenger
 
 == SYNOPSIS:
 
@@ -20,7 +20,7 @@ It follows the same pattern as Workling with a few tweaks.
 
 == INSTALL:
 
-  sudo gem install wurque
+  sudo gem install sweat_shop
 
 == LICENSE:
 
