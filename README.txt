@@ -2,8 +2,8 @@
 
 == DESCRIPTION:
 
-Sweatshop is as simple asynchronous worker queue built on top of
-rabbitmq/ampq. Inspired by Workling, it follows some of the same patterns with a few tweaks.
+Sweatshop is a simple asynchronous worker queue built on top of rabbitmq/ampq. 
+Inspired by Workling, it follows some of the same patterns with a few tweaks.
 
 == FEATURES/PROBLEMS:
 

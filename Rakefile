@@ -1,11 +1,41 @@
-# -*- ruby -*-
+require 'rake'
+require 'rake/testtask'
+require 'rake/rdoctask'
+require 'rcov/rcovtask'
 
-require 'rubygems'
-require 'hoe'
-require './lib/sweat_shop.rb'
-
-Hoe.new('sweat_shop', SweatShop::VERSION::STRING) do |p|
-   p.developer('Amos Elliston', 'famoseagle@gmail.com')
+begin
+  require 'jeweler'
+  Jeweler::Tasks.new do |s|
+    s.name = "sweat_shop"
+    s.summary = %Q{SweatShop is a simple asynchronous worker queue build on top of rabbitmq/ampq}
+    s.email = "amos@geni.com"
+    s.homepage = "http://github.com/famoseagle/sweat-shop"
+    s.description = "TODO"
+    s.authors = ["Amos Elliston"]
+    s.files =  FileList["[A-Z]*", "{lib,test,config}/**/*"]
+  end
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
 
-# vim: syntax=Ruby
+Rake::TestTask.new do |t|
+  t.libs << 'lib'
+  t.pattern = 'test/**/*_test.rb'
+  t.verbose = false
+end
+
+Rake::RDocTask.new do |rdoc|
+  rdoc.rdoc_dir = 'rdoc'
+  rdoc.title    = 'new_project'
+  rdoc.options << '--line-numbers' << '--inline-source'
+  rdoc.rdoc_files.include('README*')
+  rdoc.rdoc_files.include('lib/**/*.rb')
+end
+
+Rcov::RcovTask.new do |t|
+  t.libs << 'test'
+  t.test_files = FileList['test/**/*_test.rb']
+  t.verbose = true
+end
+
+task :default => :rcov
