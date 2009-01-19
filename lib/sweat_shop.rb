@@ -64,3 +64,7 @@ module SweatShop
     end
   end
 end
+
+if defined?(RAILS_ROOT)
+  Dir.glob(RAILS_ROOT + '/app/workers/*.rb').each{|worker| require worker }
+end

@@ -1,7 +1,9 @@
 module SweatShop
   class Worker
-    @@mq           = nil
-    @@em_thread    = nil
+    TIME_FORMAT = '%Y/%m/%d %H:%M:%S'
+    @@mq        = nil
+    @@em_thread = nil
+    @@logger    = nil
 
     def self.inherited(subclass)
       self.workers << subclass
@@ -17,7 +19,7 @@ module SweatShop
         end
 
         uid  = ::Digest::MD5.hexdigest("#{self.name}:#{method}:#{args}:#{Time.now.to_f}")
-        task = Marshal.dump({:args => args, :method => method, :uid => uid})
+        task = Marshal.dump({:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i})
         log("Putting #{uid} on #{queue_name}")
 
         self.em_thread = Thread.new{EM.run} if em_thread.nil? and not EM.reactor_running?
@@ -57,7 +59,7 @@ module SweatShop
         mq.queue(queue_name).subscribe do |task|
           task = Marshal.load(task)
           before_task.call(task) if before_task
-          log("Dequeuing #{task[:method]}")
+          log("Dequeuing #{queue_name}::#{task[:method]} (queued #{task[:queued_at] && Time.at(task[:queued_at]).strftime(TIME_FORMAT)})")
           task[:result] = instance.send(task[:method], *task[:args]) 
           after_task.call(task)  if after_task
         end
@@ -73,7 +75,11 @@ module SweatShop
     end
 
     def self.logger
-      defined?(RAILS_DEFAULT_LOGGER) && RAILS_DEFAULT_LOGGER
+      @@logger
+    end
+
+    def self.logger=(logger)
+      @@logger = logger
     end
 
     def self.before_task(&block)
@@ -109,7 +115,7 @@ module SweatShop
       EM.stop
       cleanup
     end
-
+    
     Signal.trap('TERM') do 
       EM.stop 
       cleanup
