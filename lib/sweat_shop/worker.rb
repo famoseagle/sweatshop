@@ -8,7 +8,7 @@ module SweatShop
     end
 
     def self.method_missing(method, *args, &block)
-      if method.to_s =~ /^async_(.*)/
+      if method.to_s =~ /^async_(.*)/ and config['enable']
         method        = $1
         expected_args = instance.method(method).arity
         
@@ -36,8 +36,12 @@ module SweatShop
 
     def self.mq
       @@mq ||= begin
-        @@mq = MQ.new
+        @@mq = MQ.new(AMQP.connect(:host => config['host'], :port => config['port']))
       end
+    end
+
+    def self.config
+      SweatShop.config
     end
 
     def self.cleanup

@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'mq'
 require 'digest'
+require 'yaml'
 
 $:.unshift(File.dirname(__FILE__))
 require 'sweat_shop/metaid'
@@ -47,5 +48,19 @@ module SweatShop
     complete_tasks(
       workers_in_group(:default)
     )
+  end
+
+  def config
+    @config ||= begin
+      config = if defined?(RAILS_ROOT)
+        file = File.join(RAILS_ROOT, 'config', 'workling.yml')
+        YAML.load_file(file)[RAILS_ENV || 'development'] if File.exist?(file)
+      end
+      if config
+        config
+      else
+        YAML.load_file(File.dirname(__FILE__) + '/../config/sweatshop.yml')
+      end
+    end
   end
 end
