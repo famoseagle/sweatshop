@@ -35,3 +35,7 @@ Rcov::RcovTask.new do |t|
 end
 
 task :default => :test
+
+task :setup do
+  require File.dirname(__FILE__) + '/install'
+end

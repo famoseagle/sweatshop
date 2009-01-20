@@ -2,7 +2,6 @@ require File.dirname(__FILE__) + '/metaid'
 
 module SweatShop
   class Worker
-    TIME_FORMAT = '%Y/%m/%d %H:%M:%S'
     @@mq        = nil
     @@em_thread = nil
     @@logger    = nil
@@ -15,7 +14,6 @@ module SweatShop
       if method.to_s =~ /^async_(.*)/ and config['enable']
         method        = $1
         expected_args = instance.method(method).arity
-        
         if expected_args != args.size 
           raise ArgumentError.new("#{method} expects #{expected_args} arguments")
         end
@@ -25,7 +23,7 @@ module SweatShop
         log("Putting #{uid} on #{queue_name}")
 
         self.em_thread = Thread.new{EM.run} if em_thread.nil? and not EM.reactor_running?
-        mq.queue(queue_name).publish(task, :durable => true)
+        mq.queue(queue_name).publish(task)
         uid
       elsif instance.respond_to?(method)
         instance.send(method, *args)
@@ -61,9 +59,13 @@ module SweatShop
         mq.queue(queue_name).subscribe do |task|
           task = Marshal.load(task)
           before_task.call(task) if before_task
-          log("Dequeuing #{queue_name}::#{task[:method]} (queued #{task[:queued_at] && Time.at(task[:queued_at]).strftime(TIME_FORMAT)})")
+
+          msg = "Dequeuing #{queue_name}::#{task[:method]}"
+          msg << " (queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" if task[:queued_at]
+          log(msg) 
+
           task[:result] = instance.send(task[:method], *task[:args]) 
-          after_task.call(task)  if after_task
+          after_task.call(task) if after_task
         end
       end
     end

@@ -50,19 +50,23 @@ module SweatShop
 
   def config
     @config ||= begin
+      defaults = YAML.load_file(File.dirname(__FILE__) + '/../config/defaults.yml')
       if defined?(RAILS_ROOT)
         file = RAILS_ROOT + '/config/sweatshop.yml'
         if File.exist?(file)
           YAML.load_file(file)[RAILS_ENV || 'development']
         else
-          config = YAML.load_file(File.dirname(__FILE__) + '/../config/sweatshop.yml')
-          config['enable'] = false
-          config
+          defaults['enable'] = false
+          defaults
         end
       else
-        YAML.load_file(File.dirname(__FILE__) + '/../config/sweatshop.yml')
+        defaults
       end
     end
+  end
+
+  def daemonize
+    require File.dirname(__FILE__) + '/sweat_shop/sweatd'
   end
 end
 

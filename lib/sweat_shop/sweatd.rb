@@ -1,7 +1,3 @@
-# Rails environment
-if File.exists?(File.dirname(__FILE__) + '/../../../../config/environment.rb')
-  require File.dirname(__FILE__) + '/../../../../config/environment'
-end
 require File.dirname(__FILE__) + '/../sweat_shop'
 require 'i_can_daemonize'
 
@@ -11,16 +7,20 @@ module SweatShop
     queues = []
     groups = []
 
-    arg '--queues=QUEUE,QUEUE', 'Optional queues (workers) to service. (Default is all)' do |value|
+    arg '--queues=QUEUE,QUEUE', 'Queues (workers) to service. (Default is all)' do |value|
       queues = value.split(',').collect{|q| q.constantize}
     end
 
-    arg '--groups=GROUP,GROUP', 'Optional groups of queues to service' do |value|
+    arg '--groups=GROUP,GROUP', 'Groups of queues to service' do |value|
       groups = value.split(',').collect{|g| g.to_sym}
     end
 
-    arg '--worker=WORKERFILE', 'Optional worker file to load'  do |value|
+    arg '--worker=WORKERFILE', 'Worker file to load'  do |value|
       require value
+    end
+
+    arg '--worker-dir=WORKERDIR', 'Directory containing workers'  do |value|
+      Dir.glob(value + '*.rb').each{|worker| require worker}
     end
 
     sig(:term) do
