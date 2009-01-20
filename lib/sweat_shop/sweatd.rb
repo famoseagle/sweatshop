@@ -3,8 +3,7 @@ if File.exists?(File.dirname(__FILE__) + '/../../../../config/environment.rb')
   require File.dirname(__FILE__) + '/../../../../config/environment'
 end
 require File.dirname(__FILE__) + '/../sweat_shop'
-#require 'i_can_daemonize'
-require File.dirname(__FILE__) + '/../../../i_can_daemonize/lib/i_can_daemonize'
+require 'i_can_daemonize'
 
 module SweatShop
   class Sweatd

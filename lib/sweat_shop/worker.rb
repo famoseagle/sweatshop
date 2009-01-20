@@ -1,3 +1,5 @@
+require File.dirname(__FILE__) + '/metaid'
+
 module SweatShop
   class Worker
     TIME_FORMAT = '%Y/%m/%d %H:%M:%S'

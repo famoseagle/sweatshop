@@ -4,9 +4,7 @@ require 'digest'
 require 'yaml'
 
 $:.unshift(File.dirname(__FILE__))
-require 'sweat_shop/metaid'
 require 'sweat_shop/worker'
-require 'sweat_shop/version'
 
 module SweatShop
   extend self
@@ -52,12 +50,15 @@ module SweatShop
 
   def config
     @config ||= begin
-      config = if defined?(RAILS_ROOT)
-        file = File.join(RAILS_ROOT, 'config', 'workling.yml')
-        YAML.load_file(file)[RAILS_ENV || 'development'] if File.exist?(file)
-      end
-      if config
-        config
+      if defined?(RAILS_ROOT)
+        file = RAILS_ROOT + '/config/sweatshop.yml'
+        if File.exist?(file)
+          YAML.load_file(file)[RAILS_ENV || 'development']
+        else
+          config = YAML.load_file(File.dirname(__FILE__) + '/../config/sweatshop.yml')
+          config['enable'] = false
+          config
+        end
       else
         YAML.load_file(File.dirname(__FILE__) + '/../config/sweatshop.yml')
       end
