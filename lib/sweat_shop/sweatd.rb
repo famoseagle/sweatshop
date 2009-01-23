@@ -4,10 +4,11 @@ require 'i_can_daemonize'
 module SweatShop
   class Sweatd
     include ICanDaemonize
-    queues = []
-    groups = []
+    queues     = []
+    groups     = []
+    rails_root = nil
 
-    arg '--queues=QUEUE,QUEUE', 'Queues (workers) to service. (Default is all)' do |value|
+    arg '--workers=Worker,Worker', 'Workers to service (Default is all)' do |value|
       queues = value.split(',').collect{|q| q.constantize}
     end
 
@@ -15,12 +16,16 @@ module SweatShop
       groups = value.split(',').collect{|g| g.to_sym}
     end
 
-    arg '--worker=WORKERFILE', 'Worker file to load'  do |value|
+    arg '--worker-file=WORKERFILE', 'Worker file to load'  do |value|
       require value
     end
 
     arg '--worker-dir=WORKERDIR', 'Directory containing workers'  do |value|
       Dir.glob(value + '*.rb').each{|worker| require worker}
+    end
+
+    arg '--rails=DIR', 'Pass in RAILS_ROOT to run this daemon in a rails environment' do |value|
+      rails_root = value
     end
 
     sig(:term) do
@@ -31,15 +36,21 @@ module SweatShop
       EM.stop 
     end
 
+    before do
+      return unless rails_root
+      puts "Loading Rails..."
+      require rails_root + '/config/environment' 
+    end
+
     daemonize do
       workers = []
 
       if groups.any?
-        workers << SweatShop.workers_in_groups(groups)
+        workers += SweatShop.workers_in_group(groups)
       end
 
       if queues.any?
-        workers << queues
+        workers += queues
       end
 
       if workers.any?

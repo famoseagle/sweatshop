@@ -64,10 +64,6 @@ module SweatShop
       end
     end
   end
-
-  def daemonize
-    require File.dirname(__FILE__) + '/sweat_shop/sweatd'
-  end
 end
 
 if defined?(RAILS_ROOT)

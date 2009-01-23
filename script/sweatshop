@@ -1,13 +1,21 @@
 #!/usr/bin/env ruby
 
-puts "Loading Rails..."
-require File.dirname(__FILE__) + '/../config/environment'
-
 if ARGV.include?('-d')
   ARGV.delete('-d')
   ARGV.unshift('start') unless ARGV.include?('stop')
-  SweatShop.daemonize
+
+  root = File.expand_path(File.dirname(__FILE__) + '/..')
+  ARGV << "--rails=#{root}"
+
+  # for frozen gems..
+  Dir.glob(root + '/vendor/gems/**/lib') do |lib|
+    $:.unshift(lib)
+  end
+
+  require 'sweat_shop/sweatd'
 else
+  puts "Loading Rails..."
+  require File.dirname(__FILE__) + '/../config/environment'
   puts "Listening for new tasks..."
   SweatShop.complete_all_tasks
 end
