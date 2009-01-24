@@ -9,7 +9,7 @@ module SweatShop
     rails_root = nil
 
     arg '--workers=Worker,Worker', 'Workers to service (Default is all)' do |value|
-      queues = value.split(',').collect{|q| q.constantize}
+      queues = value.split(',')
     end
 
     arg '--groups=GROUP,GROUP', 'Groups of queues to service' do |value|
@@ -50,7 +50,7 @@ module SweatShop
       end
 
       if queues.any?
-        workers += queues
+        workers += queues.collect{|q| Object.module_eval(q)}
       end
 
       if workers.any?
