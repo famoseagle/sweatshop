@@ -42,7 +42,7 @@ module SweatShop
       require rails_root + '/config/environment' 
     end
 
-    daemonize do
+    daemonize(:kill_timeout => 20) do
       workers = []
 
       if groups.any?
