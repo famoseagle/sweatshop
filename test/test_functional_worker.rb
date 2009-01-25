@@ -16,8 +16,9 @@ class WorkerTest < Test::Unit::TestCase
     worker = File.expand_path(File.dirname(__FILE__) + '/hello_worker')
     sweatd = "#{File.dirname(__FILE__)}/../lib/sweat_shop/sweatd.rb" 
     uid = HelloWorker.async_hello('Amos')
-    `ruby #{sweatd} --worker=#{worker} start`
+    `ruby #{sweatd} --worker-file #{worker} start`
     `ruby #{sweatd} stop`
+    File.delete('sweatd.log') if File.exist?('sweatd.log')
     assert_equal 'Hi, Amos', File.read(HelloWorker::TEST_FILE)
   end
   

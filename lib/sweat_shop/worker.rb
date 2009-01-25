@@ -23,7 +23,7 @@ module SweatShop
         log("Putting #{uid} on #{queue_name}")
 
         self.em_thread = Thread.new{EM.run} if em_thread.nil? and not EM.reactor_running?
-        mq.queue(queue_name).publish(task)
+        mq.queue(queue_name, :durable => true).publish(task, :persistent => true)
         uid
       elsif instance.respond_to?(method)
         instance.send(method, *args)
@@ -56,7 +56,7 @@ module SweatShop
 
     def self.complete_tasks
       EM.run do
-        mq.queue(queue_name).subscribe do |task|
+        mq.queue(queue_name, :durable => true).subscribe do |task|
           task = Marshal.load(task)
           before_task.call(task) if before_task
 

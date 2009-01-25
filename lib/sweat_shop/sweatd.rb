@@ -37,9 +37,10 @@ module SweatShop
     end
 
     before do
-      return unless rails_root
-      puts "Loading Rails..."
-      require rails_root + '/config/environment' 
+      if rails_root
+        puts "Loading Rails..."
+        require rails_root + '/config/environment' 
+      end
     end
 
     daemonize(:kill_timeout => 20) do
