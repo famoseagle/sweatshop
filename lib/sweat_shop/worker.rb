@@ -61,7 +61,7 @@ module SweatShop
           before_task.call(task) if before_task
 
           msg = "Dequeuing #{queue_name}::#{task[:method]}"
-          msg << " (queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" if task[:queued_at]
+          msg << "  (queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" if task[:queued_at]
           log(msg) 
 
           task[:result] = instance.send(task[:method], *task[:args]) 
