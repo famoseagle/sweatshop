@@ -58,16 +58,26 @@ module SweatShop
       EM.run do
         mq.queue(queue_name, :durable => true).subscribe do |task|
           task = Marshal.load(task)
-          before_task.call(task) if before_task
+          call_before_task(task)
 
           msg = "Dequeuing #{queue_name}::#{task[:method]}"
           msg << "  (queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" if task[:queued_at]
-          log(msg) 
+          log(msg)
 
-          task[:result] = instance.send(task[:method], *task[:args]) 
-          after_task.call(task) if after_task
+          task[:result] = instance.send(task[:method], *task[:args])
+          call_after_task(task)
         end
       end
+    end
+
+    def self.call_before_task(task)
+      superclass.call_before_task(task) if superclass.respond_to?(:call_before_task)
+      before_task.call if before_task
+    end
+
+    def self.call_after_task(task)
+      superclass.call_after_task(task) if superclass.respond_to?(:call_after_task)
+      after_task.call if after_task
     end
 
     def self.workers

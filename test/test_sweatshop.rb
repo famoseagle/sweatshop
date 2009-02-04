@@ -1,4 +1,5 @@
 require File.dirname(__FILE__) + '/test_helper'
+require File.dirname(__FILE__) + '/../lib/sweat_shop'
 
 class SweatShopTest < Test::Unit::TestCase
   SweatShop.workers = []
@@ -41,5 +42,23 @@ class SweatShopTest < Test::Unit::TestCase
       "goodbye"
     end
     assert_equal "goodbye", HelloWorker.after_task.call
+  end
+
+  test "chainable before tasks" do
+    MESSAGES = []
+    class BaseWorker < SweatShop::Worker
+      before_task do
+        MESSAGES << 'base'
+      end
+    end
+    class SubWorker < BaseWorker
+      before_task do
+        MESSAGES << 'sub'
+      end
+    end
+    SubWorker.call_before_task('foo')
+    assert_equal ['base', 'sub'], MESSAGES
+    SweatShop.workers.delete(BaseWorker)
+    SweatShop.workers.delete(SubWorker)
   end
 end
