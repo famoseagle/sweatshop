@@ -47,12 +47,12 @@ class SweatShopTest < Test::Unit::TestCase
   test "chainable before tasks" do
     MESSAGES = []
     class BaseWorker < SweatShop::Worker
-      before_task do
+      before_task do |task|
         MESSAGES << 'base'
       end
     end
     class SubWorker < BaseWorker
-      before_task do
+      before_task do |task|
         MESSAGES << 'sub'
       end
     end

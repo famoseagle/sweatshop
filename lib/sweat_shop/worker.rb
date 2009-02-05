@@ -72,12 +72,12 @@ module SweatShop
 
     def self.call_before_task(task)
       superclass.call_before_task(task) if superclass.respond_to?(:call_before_task)
-      before_task.call if before_task
+      before_task.call(task) if before_task
     end
 
     def self.call_after_task(task)
       superclass.call_after_task(task) if superclass.respond_to?(:call_after_task)
-      after_task.call if after_task
+      after_task.call(task) if after_task
     end
 
     def self.workers
