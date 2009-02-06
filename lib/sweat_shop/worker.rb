@@ -22,13 +22,30 @@ module SweatShop
         task = Marshal.dump({:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i})
         log("Putting #{uid} on #{queue_name}")
 
-        self.em_thread = Thread.new{EM.run} if em_thread.nil? and not EM.reactor_running?
+        start_em!
         mq.queue(queue_name, :durable => true).publish(task, :persistent => true)
+
         uid
       elsif instance.respond_to?(method)
         instance.send(method, *args)
       else
         super
+      end
+    end
+
+    def self.start_em!
+      if em_thread.nil? and not EM.reactor_running?
+        self.em_thread = Thread.new{EM.run}
+
+        Signal.trap('INT') do 
+          EM.stop
+          cleanup
+        end
+        
+        Signal.trap('TERM') do 
+          EM.stop 
+          cleanup
+        end
       end
     end
 
@@ -125,14 +142,5 @@ module SweatShop
     end
     queue_group :default
 
-    Signal.trap('INT') do 
-      EM.stop
-      cleanup
-    end
-    
-    Signal.trap('TERM') do 
-      EM.stop 
-      cleanup
-    end
   end
 end
