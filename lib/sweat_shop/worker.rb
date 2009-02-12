@@ -74,17 +74,19 @@ module SweatShop
     def self.complete_tasks
       EM.run do
         queue = mq.queue(queue_name, :durable => true)
-        queue.pop do |task|
-          task = Marshal.load(task)
-          call_before_task(task)
+        queue.pop(:ack => true) do |info, task|
+          if task
+            task = Marshal.load(task)
+            call_before_task(task)
 
-          msg = "Dequeuing #{queue_name}::#{task[:method]}"
-          msg << "  (queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" if task[:queued_at]
-          log(msg)
+            msg = "Dequeuing #{queue_name}::#{task[:method]}"
+            msg << "  (queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" if task[:queued_at]
+            log(msg)
 
-          task[:result] = instance.send(task[:method], *task[:args])
-          call_after_task(task)
-
+            task[:result] = instance.send(task[:method], *task[:args])
+            call_after_task(task)
+            info.ack
+          end
           EM.add_timer(0.001){ queue.pop } 
         end
       end
