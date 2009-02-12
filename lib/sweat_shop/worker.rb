@@ -73,7 +73,8 @@ module SweatShop
 
     def self.complete_tasks
       EM.run do
-        mq.queue(queue_name, :durable => true).subscribe do |task|
+        queue = mq.queue(queue_name, :durable => true)
+        queue.pop do |task|
           task = Marshal.load(task)
           call_before_task(task)
 
@@ -83,6 +84,8 @@ module SweatShop
 
           task[:result] = instance.send(task[:method], *task[:args])
           call_after_task(task)
+
+          EM.add_timer(0.001){ queue.pop } 
         end
       end
     end
