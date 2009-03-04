@@ -36,12 +36,10 @@ module SweatShop
     def self.start_em!
       if em_thread.nil? and not EM.reactor_running?
         self.em_thread = Thread.new{EM.run}
-
         Signal.trap('INT') do 
           EM.stop
           cleanup
         end
-        
         Signal.trap('TERM') do 
           EM.stop 
           cleanup
@@ -73,8 +71,7 @@ module SweatShop
 
     def self.complete_tasks
       EM.run do
-        queue = mq.queue(queue_name, :durable => true)
-        queue.pop(:ack => true) do |info, task|
+        mq.queue(queue_name, :durable => true).subscribe(:ack => true) do |info, task|
           if task
             task = Marshal.load(task)
             call_before_task(task)
@@ -87,7 +84,6 @@ module SweatShop
             call_after_task(task)
             info.ack
           end
-          EM.add_timer(0.001){ queue.pop } 
         end
       end
     end
