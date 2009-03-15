@@ -94,5 +94,4 @@ end
 
 if defined?(RAILS_ROOT)
   Dir.glob(RAILS_ROOT + '/app/workers/*.rb').each{|worker| require worker }
-  SweatShop::Worker.logger = RAILS_DEFAULT_LOGGER
 end
