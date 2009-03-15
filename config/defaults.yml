@@ -1,4 +1,4 @@
 # default options
-host: localhost
-port: 5672
+servers:
+  - localhost:22133
 enable: true

@@ -1,3 +1,4 @@
+require 'pp'
 require File.dirname(__FILE__) + '/../sweat_shop'
 require 'i_can_daemonize'
 
@@ -29,11 +30,11 @@ module SweatShop
     end
 
     sig(:term) do
-      EM.stop
+      SweatShop.stop!
     end
     
     sig(:int) do
-      EM.stop 
+      SweatShop.stop!
     end
 
     before do
@@ -58,11 +59,11 @@ module SweatShop
         worker_str = workers.join(',')
         puts "Starting #{worker_str}..." 
         $0 = "Sweatd: #{worker_str}"
-        SweatShop.complete_tasks(workers)
+        SweatShop.do_tasks(workers)
       else
         puts "Starting all workers..." 
         $0 = 'Sweatd: all'
-        SweatShop.complete_all_tasks
+        SweatShop.do_all_tasks
       end
     end
 

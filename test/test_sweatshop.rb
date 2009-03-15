@@ -1,8 +1,10 @@
+require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_mock'
 require File.dirname(__FILE__) + '/test_helper'
 require File.dirname(__FILE__) + '/../lib/sweat_shop'
 
 class SweatShopTest < Test::Unit::TestCase
   SweatShop.workers = []
+  SweatShop.queue = MemCacheMock.new 
 
   class HelloWorker < SweatShop::Worker
     def hello(name)
@@ -26,6 +28,7 @@ class SweatShopTest < Test::Unit::TestCase
   end
 
   test "uid" do
+    SweatShop::Worker.logger = :silent
     uid = HelloWorker.async_hello('Amos')
     assert_not_nil uid
   end

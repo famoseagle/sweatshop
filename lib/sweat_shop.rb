@@ -1,7 +1,10 @@
 require 'rubygems'
-require 'mq'
 require 'digest'
 require 'yaml'
+
+#require File.dirname(__FILE__) + '/../../memcache/lib/memcache'
+require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_extended'
+require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_util'
 
 $:.unshift(File.dirname(__FILE__))
 require 'sweat_shop/worker'
@@ -17,14 +20,6 @@ module SweatShop
     @workers = workers 
   end
 
-  def complete_tasks(workers)
-    EM.run do
-      workers.each do |worker|
-        worker.complete_tasks
-      end
-    end
-  end
-
   def workers_in_group(groups)
     groups = [groups] unless groups.is_a?(Array)
     if groups.include?(:all)
@@ -36,16 +31,38 @@ module SweatShop
     end
   end
 
-  def complete_all_tasks
-    complete_tasks(
+  def do_tasks(workers)
+    loop do
+      wait = true
+      workers.each do |worker|
+        if task = worker.pop
+          worker.do_task(task)
+          wait = false
+        end
+      end
+      exit if stop?
+      sleep 0.25 if wait
+    end
+  end
+
+  def do_all_tasks
+    do_tasks(
       workers_in_group(:all)
     )
   end
 
-  def complete_default_tasks
-    complete_tasks(
+  def do_default_tasks
+    do_tasks(
       workers_in_group(:default)
     )
+  end
+
+  def stop!
+    @stop = true
+  end
+
+  def stop?
+    @stop
   end
 
   def config
@@ -64,8 +81,18 @@ module SweatShop
       end
     end
   end
+
+  def queue
+    @queue ||= MemCache.new('localhost:22133')
+    # @queue ||= MemCache::Server.new(:host => config[:host], :port => config[:port])
+  end
+
+  def queue=(queue)
+    @queue = queue
+  end
 end
 
 if defined?(RAILS_ROOT)
   Dir.glob(RAILS_ROOT + '/app/workers/*.rb').each{|worker| require worker }
+  SweatShop::Worker.logger = RAILS_DEFAULT_LOGGER
 end
