@@ -4,7 +4,7 @@ require File.dirname(__FILE__) + '/../lib/sweat_shop'
 
 class SweatShopTest < Test::Unit::TestCase
   SweatShop.workers = []
-  SweatShop.queue = MemCacheMock.new 
+  SweatShop.queue   = Kestrel.new(:client => MemCacheMock.new)
 
   class HelloWorker < SweatShop::Worker
     def hello(name)

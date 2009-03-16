@@ -2,11 +2,8 @@ require 'rubygems'
 require 'digest'
 require 'yaml'
 
-#require File.dirname(__FILE__) + '/../../memcache/lib/memcache'
-require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_extended'
-require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_util'
-
 $:.unshift(File.dirname(__FILE__))
+require 'kestrel'
 require 'sweat_shop/worker'
 
 module SweatShop
@@ -83,8 +80,7 @@ module SweatShop
   end
 
   def queue
-    @queue ||= MemCache.new('localhost:22133')
-    # @queue ||= MemCache::Server.new(:host => config[:host], :port => config[:port])
+    @queue ||= Kestrel.new(:servers => 'localhost:22133')
   end
 
   def queue=(queue)

@@ -16,11 +16,11 @@ module SweatShop
           raise ArgumentError.new("#{method} expects #{expected_args} arguments")
         end
 
-        uid  = ::Digest::MD5.hexdigest("#{self.name}:#{method}:#{args}:#{Time.now.to_f}")
+        uid  = ::Digest::MD5.hexdigest("#{name}:#{method}:#{args}:#{Time.now.to_f}")
         task = {:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i}
 
         log("Putting #{uid} on #{queue_name}")
-        queue.set(queue_name, task)
+        queue.enqueue(queue_name, task)
 
         uid
       elsif instance.respond_to?(method)
@@ -42,14 +42,18 @@ module SweatShop
       @queue_name ||= self.to_s
     end
 
-    def self.pop
-      queue.get("#{queue_name}/open")
-    end
-    
-    def self.confirm
-      queue.get("#{queue_name}/close")
+    def self.queue_size
+      queue.queue_size(queue_name)
     end
 
+    def self.pop
+      queue.dequeue(queue_name)
+    end
+
+    def self.confirm
+      queue.confirm(queue_name)
+    end
+    
     def self.do_tasks
       while task = pop
         do_task(task)
