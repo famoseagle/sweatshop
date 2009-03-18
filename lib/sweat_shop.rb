@@ -79,6 +79,20 @@ module SweatShop
     end
   end
 
+  def queue_sizes
+    workers.inject([]) do |all, worker|
+      all << [worker, worker.queue_size]
+      all
+    end
+  end
+
+  def pp_sizes
+    max_width = workers.collect{|w| w.to_s.size}.max
+    puts '-' * (max_width + 10)
+    puts queue_sizes.collect{|p| sprintf("%-#{max_width}s %2s", p.first, p.last)}.join("\n")
+    puts '-' * (max_width + 10)
+  end
+
   def queue
     @queue ||= Kestrel.new(:servers => config['servers'])
   end
@@ -90,7 +104,4 @@ end
 
 if defined?(RAILS_ROOT)
   Dir.glob(RAILS_ROOT + '/app/workers/*.rb').each{|worker| require worker }
-elsif not defined?(MemCache) # for tests
-  require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_extended'
-  require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_util'
 end
