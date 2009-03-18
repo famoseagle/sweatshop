@@ -38,7 +38,7 @@ queues.
 
 SweatShop has been tested with Kestrel, but it will also work with Starling. You can install and start kestrel following the instructions here:
 
-http://github.com/robey/kestrel/tree/master
+(http://github.com/robey/kestrel/tree/master)
 
 config/sweatshop.yml specifies the machine address of the queue (default localhost:22133).
 
