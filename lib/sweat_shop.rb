@@ -32,7 +32,7 @@ module SweatShop
     loop do
       wait = true
       workers.each do |worker|
-        if task = worker.pop
+        if task = worker.dequeue
           worker.do_task(task)
           wait = false
         end
@@ -54,7 +54,7 @@ module SweatShop
     )
   end
 
-  def stop!
+  def stop
     @stop = true
   end
 
@@ -90,4 +90,7 @@ end
 
 if defined?(RAILS_ROOT)
   Dir.glob(RAILS_ROOT + '/app/workers/*.rb').each{|worker| require worker }
+elsif not defined?(MemCache) # for tests
+  require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_extended'
+  require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_util'
 end

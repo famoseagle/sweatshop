@@ -1,4 +1,3 @@
-require 'pp'
 require File.dirname(__FILE__) + '/../sweat_shop'
 require 'i_can_daemonize'
 
@@ -29,14 +28,11 @@ module SweatShop
       rails_root = value
     end
 
-    sig(:term) do
-      SweatShop.stop!
+    sig(:term, :int) do
+      puts "Shutting down sweatd..."
+      SweatShop.stop
     end
     
-    sig(:int) do
-      SweatShop.stop!
-    end
-
     before do
       if rails_root
         puts "Loading Rails..."

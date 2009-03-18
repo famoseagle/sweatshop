@@ -20,7 +20,7 @@ module SweatShop
         task = {:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i}
 
         log("Putting #{uid} on #{queue_name}")
-        queue.enqueue(queue_name, task)
+        enqueue(task)
 
         uid
       elsif instance.respond_to?(method)
@@ -46,7 +46,11 @@ module SweatShop
       queue.queue_size(queue_name)
     end
 
-    def self.pop
+    def self.enqueue(task)
+      queue.enqueue(queue_name, task)
+    end
+
+    def self.dequeue
       queue.dequeue(queue_name)
     end
 
@@ -55,7 +59,7 @@ module SweatShop
     end
     
     def self.do_tasks
-      while task = pop
+      while task = dequeue
         do_task(task)
       end
     end
@@ -63,7 +67,8 @@ module SweatShop
     def self.do_task(task)
       call_before_task(task)
 
-      log("Dequeuing #{queue_name}::#{task[:method]} (queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})")
+      queued_at = task[:queued_at] ? "(queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" : ''
+      log("Dequeuing #{queue_name}::#{task[:method]} #{queued_at}")
       task[:result] = instance.send(task[:method], *task[:args])
 
       call_after_task(task)

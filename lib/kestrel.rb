@@ -1,7 +1,3 @@
-#require File.dirname(__FILE__) + '/../../memcache/lib/memcache'
-require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_extended'
-require File.dirname(__FILE__) + '/../../../memcache/lib/memcache_util'
-
 class Kestrel
   attr_reader :client, :servers
 
