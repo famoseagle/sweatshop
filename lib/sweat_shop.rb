@@ -80,7 +80,7 @@ module SweatShop
   end
 
   def queue
-    @queue ||= Kestrel.new(:servers => 'localhost:22133')
+    @queue ||= Kestrel.new(:servers => config['servers'])
   end
 
   def queue=(queue)
