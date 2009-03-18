@@ -12,20 +12,20 @@ Currently, it runs kestrel, but it can support any number of queues.
 
 ## Writing workers
 
-Put 'email_worker.rb' into app/workers and sublcass 'SweatShop::Worker':
+Put `email_worker.rb` into app/workers and sublcass `SweatShop::Worker`:
 
-   class EmailWorker
-     def send_mail(to)
-       user = User.find_by_id(to)
-       Mailer.deliver_welcome(to)
-     end
-   end
+    class EmailWorker
+      def send_mail(to)
+        user = User.find_by_id(to)
+        Mailer.deliver_welcome(to)
+      end
+    end
 
 Then, anywhere in your app you can execute:
 
     EmailWorker.async_send_mail(1)
 
-The 'async' signifies that this task will be placed on a queue to be serviced by the EmailWorker possibly on another machine. You can also
+The `async` signifies that this task will be placed on a queue to be serviced by the EmailWorker possibly on another machine. You can also
 call:
 
     EmailWorker.send_mail(1)
@@ -36,7 +36,7 @@ queues.
 
 ## Running the queue
 
-SweatShop has been tested with Kestrel. You can install and start kestrel following the instructions here:
+SweatShop has been tested with Kestrel, but it will also work with Starling. You can install and start kestrel following the instructions here:
 
 http://github.com/robey/kestrel/tree/master
 
@@ -48,7 +48,7 @@ Assuming you ran `rake setup` in Rails, you can type:
 
     script/sweatshop
 
-By default, the script will run all workers defined in the app/workers dir. Every task will be processed on each queue using a round-robin algorithm. You can also add the `-d` flag which will put the worker in daemon mode. The daemon also takes other params.  Add a '-h' for more details.
+By default, the script will run all workers defined in the app/workers dir. Every task will be processed on each queue using a round-robin algorithm. You can also add the `-d` flag which will put the worker in daemon mode. The daemon also takes other params.  Add a `-h` for more details.
 
     script/sweatshop -d
     script/sweatshop -d stop
@@ -62,4 +62,4 @@ If you would like to run SweatShop as a daemon on a linux machine, use the initd
 
 # LICENSE
 
-Copyright (c) 2009 Amos Elliston, Geni.com; Published under The MIT License, see License.txt
+Copyright (c) 2009 Amos Elliston, Geni.com; Published under The MIT License, see License
