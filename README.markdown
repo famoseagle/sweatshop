@@ -14,12 +14,12 @@ Currently, it runs kestrel, but it can support any number of queues.
 
 Put 'email_worker.rb' into app/workers and sublcass 'SweatShop::Worker':
 
-class EmailWorker
-  def send_mail(to)
-    user = User.find_by_id(to)
-    Mailer.deliver_welcome(to)
-  end
-end
+   class EmailWorker
+     def send_mail(to)
+       user = User.find_by_id(to)
+       Mailer.deliver_welcome(to)
+     end
+   end
 
 Then, anywhere in your app you can execute:
 
@@ -50,7 +50,7 @@ Assuming you ran `rake setup` in Rails, you can type:
 
 By default, the script will run all workers defined in the app/workers dir. Every task will be processed on each queue using a round-robin algorithm. You can also add the `-d` flag which will put the worker in daemon mode. The daemon also takes other params.  Add a '-h' for more details.
 
-    script/sweatshop -d start
+    script/sweatshop -d
     script/sweatshop -d stop
 
 If you would like to run SweatShop as a daemon on a linux machine, use the initd.sh script provided in the sweat_shop/script dir.
