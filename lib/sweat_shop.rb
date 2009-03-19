@@ -38,7 +38,7 @@ module SweatShop
         end
       end
       exit if stop?
-      sleep 0.25 if wait
+      sleep 1 if wait
     end
   end
 
