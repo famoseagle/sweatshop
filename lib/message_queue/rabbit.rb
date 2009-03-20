@@ -7,6 +7,7 @@ module MessageQueue
       @servers = opts[:servers]
       @info = {}
       @host, @port = @servers.first.split(':')
+      @port = @port.to_i
     end
 
     def queue_size(queue)
@@ -37,7 +38,7 @@ module MessageQueue
       @client ||= begin 
         start_em
         if servers
-          MQ.new(AMQP.connect(:host => @host, :port => @port.to_i)) 
+          MQ.new(AMQP.connect(:host => @host, :port => @port)) 
         else
           MQ.new
         end

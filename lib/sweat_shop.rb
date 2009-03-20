@@ -32,8 +32,10 @@ module SweatShop
 
   def do_tasks(workers)
     if queue.subscribe?
-      workers.each do |worker|
-        worker.subscribe
+      EM.run do
+        workers.each do |worker|
+          worker.subscribe
+        end
       end
     else
       loop do
