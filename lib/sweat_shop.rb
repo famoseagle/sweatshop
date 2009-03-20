@@ -64,6 +64,14 @@ module SweatShop
     )
   end
 
+  def stop
+    @stop = true
+  end
+
+  def stop?
+    @stop
+  end
+
   def config
     @config ||= begin
       defaults = YAML.load_file(File.dirname(__FILE__) + '/../config/defaults.yml')

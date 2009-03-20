@@ -29,7 +29,8 @@ module SweatShop
     end
 
     sig(:term, :int) do
-      SweatShop::Worker.stop
+      puts "Shutting down sweatd..."
+      SweatShop.stop
     end
     
     before do

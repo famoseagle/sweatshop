@@ -2,9 +2,6 @@ require File.dirname(__FILE__) + '/metaid'
 
 module SweatShop
   class Worker
-    @@mq        = nil
-    @@em_thread = nil
-
     def self.inherited(subclass)
       self.workers << subclass
     end
@@ -17,10 +14,10 @@ module SweatShop
           raise ArgumentError.new("#{method} expects #{expected_args} arguments")
         end
 
-        uid  = ::Digest::MD5.hexdigest("#{self.name}:#{method}:#{args}:#{Time.now.to_f}")
+        uid  = ::Digest::MD5.hexdigest("#{name}:#{method}:#{args}:#{Time.now.to_f}")
         task = {:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i}
-        log("Putting #{uid} on #{queue_name}")
 
+        log("Putting #{uid} on #{queue_name}")
         enqueue(task)
 
         uid
@@ -35,22 +32,16 @@ module SweatShop
       @instance ||= new
     end
 
+    def self.config
+      SweatShop.config
+    end
+
     def self.queue_name
       @queue_name ||= self.to_s
     end
 
-    def self.stop
-      queue.stop
-    end
-
     def self.queue_size
       queue.queue_size(queue_name)
-    end
-
-    def self.subscribe
-      queue.subscribe(queue_name) do |task|
-        do_task(task)
-      end
     end
 
     def self.enqueue(task)
@@ -65,6 +56,12 @@ module SweatShop
       queue.confirm(queue_name)
     end
 
+    def self.subscribe
+      queue.subscribe(queue_name) do |task|
+        do_task(task)
+      end
+    end
+    
     def self.do_tasks
       while task = dequeue
         do_task(task)
