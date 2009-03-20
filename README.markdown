@@ -1,7 +1,7 @@
 # SweatShop
 
 SweatShop provides an api to background resource intensive tasks. Much of the api design was copied from Workling, with a few tweaks.
-Currently, it runs kestrel, but it can support any number of queues.
+Currently, it runs rabbitmq and kestrel, but it can support any number of queues.
 
 ## Installing 
 
