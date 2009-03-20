@@ -57,6 +57,12 @@ module SweatShop
     def self.confirm
       queue.confirm(queue_name)
     end
+
+    def self.subscribe
+      queue.subscribe(queue_name) do |task|
+        do_task(task)
+      end
+    end
     
     def self.do_tasks
       while task = dequeue

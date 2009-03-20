@@ -3,7 +3,11 @@ require 'digest'
 require 'yaml'
 
 $:.unshift(File.dirname(__FILE__))
-require 'kestrel'
+#--------------------------------------------------
+# require 'kestrel'
+#-------------------------------------------------- 
+require 'message_queue/base'
+require 'message_queue/rabbit'
 require 'sweat_shop/worker'
 
 module SweatShop
@@ -29,16 +33,22 @@ module SweatShop
   end
 
   def do_tasks(workers)
-    loop do
-      wait = true
+    if true#queue.subscribe?
       workers.each do |worker|
-        if task = worker.dequeue
-          worker.do_task(task)
-          wait = false
-        end
+        worker.subscribe
       end
-      exit if stop?
-      sleep 1 if wait
+    else
+      loop do
+        wait = true
+        workers.each do |worker|
+          if task = worker.dequeue
+            worker.do_task(task)
+            wait = false
+          end
+        end
+        exit if stop?
+        sleep 1 if wait
+      end
     end
   end
 
@@ -94,7 +104,10 @@ module SweatShop
   end
 
   def queue
-    @queue ||= Kestrel.new(:servers => config['servers'])
+    #--------------------------------------------------
+    # @queue ||= Kestrel.new(:servers => config['servers'])
+    #-------------------------------------------------- 
+    @queue ||= MessageQueue::Rabbit.new(:servers => config['servers'])
   end
 
   def queue=(queue)

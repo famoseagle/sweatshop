@@ -25,7 +25,7 @@ class WorkerTest < Test::Unit::TestCase
       `ruby #{sweatd} --worker-file #{worker} start`
       `ruby #{sweatd} stop`
 
-      File.delete('sweatd.log') if File.exist?('sweatd.log')
+      #File.delete('sweatd.log') if File.exist?('sweatd.log')
       assert_equal 'Hi, Amos', File.read(HelloWorker::TEST_FILE)
     rescue MemCache::MemCacheError => e
       puts "\n\n*** Start kestrel on localhost to run all functional tests. ***\n\n"
