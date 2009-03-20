@@ -1,12 +1,12 @@
 development:
-  host: localhost
-  port: 5672
+  servers:
+    - localhost:5672
   enable: true
 test:
-  host: localhost
-  port: 5672
+  servers:
+    - localhost:5672
   enable: false
 production:
-  host: localhost
-  port: 5672
+  servers:
+    - localhost:5672
   enable: true

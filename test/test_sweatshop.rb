@@ -26,6 +26,7 @@ class SweatShopTest < Test::Unit::TestCase
   end
 
   test "uid" do
+    SweatShop.logger = :silent
     uid = HelloWorker.async_hello('Amos')
     assert_not_nil uid
   end

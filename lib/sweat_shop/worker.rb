@@ -4,7 +4,6 @@ module SweatShop
   class Worker
     @@mq        = nil
     @@em_thread = nil
-    @@logger    = nil
 
     def self.inherited(subclass)
       self.workers << subclass
@@ -19,11 +18,10 @@ module SweatShop
         end
 
         uid  = ::Digest::MD5.hexdigest("#{self.name}:#{method}:#{args}:#{Time.now.to_f}")
-        task = Marshal.dump({:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i})
+        task = {:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i}
         log("Putting #{uid} on #{queue_name}")
 
-        start_em!
-        mq.queue(queue_name, :durable => true).publish(task, :persistent => true)
+        enqueue(task)
 
         uid
       elsif instance.respond_to?(method)
@@ -33,59 +31,55 @@ module SweatShop
       end
     end
 
-    def self.start_em!
-      if em_thread.nil? and not EM.reactor_running?
-        self.em_thread = Thread.new{EM.run}
-        Signal.trap('INT') do 
-          EM.stop
-          cleanup
-        end
-        Signal.trap('TERM') do 
-          EM.stop 
-          cleanup
-        end
-      end
-    end
-
     def self.instance
       @instance ||= new
-    end
-
-    def self.mq
-      @@mq ||= begin
-        @@mq = MQ.new(AMQP.connect(:host => config['host'], :port => config['port']))
-      end
-    end
-
-    def self.config
-      SweatShop.config
-    end
-
-    def self.cleanup
-      em_thread.join(0.15) unless em_thread.nil?
     end
 
     def self.queue_name
       @queue_name ||= self.to_s
     end
 
-    def self.complete_tasks
-      EM.run do
-        mq.queue(queue_name, :durable => true).subscribe(:ack => true) do |info, task|
-          if task
-            task = Marshal.load(task)
-            call_before_task(task)
+    def self.stop
+      queue.stop
+    end
 
-            msg = "Dequeuing #{queue_name}::#{task[:method]}"
-            msg << "  (queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" if task[:queued_at]
-            log(msg)
+    def self.queue_size
+      queue.queue_size(queue_name)
+    end
 
-            task[:result] = instance.send(task[:method], *task[:args])
-            call_after_task(task)
-            info.ack
-          end
-        end
+    def self.subscribe
+      queue.subscribe(queue_name) do |task|
+        do_task(task)
       end
+    end
+
+    def self.enqueue(task)
+      queue.enqueue(queue_name, task)
+    end
+
+    def self.dequeue
+      queue.dequeue(queue_name)
+    end
+
+    def self.confirm
+      queue.confirm(queue_name)
+    end
+
+    def self.do_tasks
+      while task = dequeue
+        do_task(task)
+      end
+    end
+
+    def self.do_task(task)
+      call_before_task(task)
+
+      queued_at = task[:queued_at] ? "(queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" : ''
+      log("Dequeuing #{queue_name}::#{task[:method]} #{queued_at}")
+      task[:result] = instance.send(task[:method], *task[:args])
+
+      call_after_task(task)
+      confirm
     end
 
     def self.call_before_task(task)
@@ -98,20 +92,20 @@ module SweatShop
       after_task.call(task) if after_task
     end
 
+    def self.queue
+      SweatShop.queue
+    end
+
     def self.workers
       SweatShop.workers
     end
 
+    def self.config
+      SweatShop.config
+    end
+
     def self.log(msg)
-      logger ? logger.debug(msg) : puts(msg)
-    end
-
-    def self.logger
-      @@logger
-    end
-
-    def self.logger=(logger)
-      @@logger = logger
+      SweatShop.log(msg)
     end
 
     def self.before_task(&block)
@@ -130,18 +124,9 @@ module SweatShop
       end
     end
 
-    def self.em_thread
-      @@em_thread
-    end
-
-    def self.em_thread=(thread)
-      @@em_thread = thread
-    end
-
     def self.queue_group(group=nil)
       group ? meta_def(:_queue_group){ group } : _queue_group
     end
     queue_group :default
-
   end
 end

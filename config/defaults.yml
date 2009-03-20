@@ -1,4 +1,5 @@
 # default options
-host: localhost
-port: 5672
+servers:
+  - localhost:5672
 enable: true
+queue: rabbit

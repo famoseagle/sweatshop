@@ -1,9 +1,11 @@
 require 'rubygems'
-require 'mq'
 require 'digest'
 require 'yaml'
 
 $:.unshift(File.dirname(__FILE__))
+require 'message_queue/base'
+require 'message_queue/rabbit'
+require 'message_queue/kestrel'
 require 'sweat_shop/worker'
 
 module SweatShop
@@ -17,14 +19,6 @@ module SweatShop
     @workers = workers 
   end
 
-  def complete_tasks(workers)
-    EM.run do
-      workers.each do |worker|
-        worker.complete_tasks
-      end
-    end
-  end
-
   def workers_in_group(groups)
     groups = [groups] unless groups.is_a?(Array)
     if groups.include?(:all)
@@ -36,14 +30,34 @@ module SweatShop
     end
   end
 
-  def complete_all_tasks
-    complete_tasks(
+  def do_tasks(workers)
+    if queue.subscribe?
+      workers.each do |worker|
+        worker.subscribe
+      end
+    else
+      loop do
+        wait = true
+        workers.each do |worker|
+          if task = worker.dequeue
+            worker.do_task(task)
+            wait = false
+          end
+        end
+        exit if stop?
+        sleep 1 if wait
+      end
+    end
+  end
+
+  def do_all_tasks
+    do_tasks(
       workers_in_group(:all)
     )
   end
 
-  def complete_default_tasks
-    complete_tasks(
+  def do_default_tasks
+    do_tasks(
       workers_in_group(:default)
     )
   end
@@ -63,6 +77,58 @@ module SweatShop
         defaults
       end
     end
+  end
+
+  def stop
+    @stop = true
+    queue.stop
+  end
+
+  def stop?
+    @stop
+  end
+
+  def queue_sizes
+    workers.inject([]) do |all, worker|
+      all << [worker, worker.queue_size]
+      all
+    end
+  end
+
+  def pp_sizes
+    max_width = workers.collect{|w| w.to_s.size}.max
+    puts '-' * (max_width + 10)
+    puts queue_sizes.collect{|p| sprintf("%-#{max_width}s %2s", p.first, p.last)}.join("\n")
+    puts '-' * (max_width + 10)
+  end
+
+  def queue
+    @queue ||= begin 
+      queue = config['queue'] || 'rabbit'
+      queue = constantize("MessageQueue::#{queue.capitalize}")
+      queue.new(:servers => config['servers'])
+    end
+  end
+
+  def queue=(queue)
+    @queue = queue
+  end
+
+  def log(msg)
+    return if logger == :silent
+    logger ? logger.debug(msg) : puts(msg)
+  end
+
+  def logger
+    @logger
+  end
+
+  def logger=(logger)
+    @logger = logger
+  end
+
+  def constantize(str)
+    Object.module_eval("#{str}", __FILE__, __LINE__)
   end
 end
 

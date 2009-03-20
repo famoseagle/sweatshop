@@ -28,14 +28,10 @@ module SweatShop
       rails_root = value
     end
 
-    sig(:term) do
-      EM.stop
+    sig(:term, :int) do
+      SweatShop::Worker.stop
     end
     
-    sig(:int) do
-      EM.stop 
-    end
-
     before do
       if rails_root
         puts "Loading Rails..."
@@ -58,11 +54,11 @@ module SweatShop
         worker_str = workers.join(',')
         puts "Starting #{worker_str}..." 
         $0 = "Sweatd: #{worker_str}"
-        SweatShop.complete_tasks(workers)
+        SweatShop.do_tasks(workers)
       else
         puts "Starting all workers..." 
         $0 = 'Sweatd: all'
-        SweatShop.complete_all_tasks
+        SweatShop.do_all_tasks
       end
     end
 
