@@ -18,7 +18,7 @@ module MessageQueue
     end
 
     def dequeue(queue)
-      task = client.queue(queue).pop
+      task = client.queue(queue).pop(:ack => true)
       return unless task
       Marshal.load(task)
     end

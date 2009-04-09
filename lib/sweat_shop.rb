@@ -46,7 +46,10 @@ module SweatShop
             wait = false
           end
         end
-        exit if stop?
+        if stop?
+          queue.stop
+          exit 
+        end
         sleep 1 if wait
       end
     end
@@ -62,14 +65,6 @@ module SweatShop
     do_tasks(
       workers_in_group(:default)
     )
-  end
-
-  def stop
-    @stop = true
-  end
-
-  def stop?
-    @stop
   end
 
   def config
@@ -91,7 +86,7 @@ module SweatShop
 
   def stop
     @stop = true
-    queue.stop
+    queue.stop if queue.subscribe?
   end
 
   def stop?
