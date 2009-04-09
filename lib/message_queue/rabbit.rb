@@ -9,6 +9,10 @@ module MessageQueue
       @port = @port.to_i
     end
 
+    def delete(queue)
+      client.queue(queue).delete
+    end
+
     def queue_size(queue)
       client.queue(queue).message_count
     end

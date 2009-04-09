@@ -6,6 +6,7 @@ module MessageQueue
     def dequeue(queue);       end
     def confirm(queue);       end
     def subscribe(queue);     end
+    def delete(queue);        end
     def client;               end
     def stop;                 end
 
