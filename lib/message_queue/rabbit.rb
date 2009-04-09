@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../../../carrot/lib/carrot'
+require 'carrot'
 module MessageQueue
   class Rabbit < Base
 
