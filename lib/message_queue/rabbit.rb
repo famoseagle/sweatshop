@@ -49,8 +49,9 @@ module MessageQueue
       if em_thread.nil? and not EM.reactor_running?
         self.em_thread = Thread.new{EM.run}
         ['INT', 'TERM'].each do |sig|
-          Signal.trap(sig) do 
+          old = trap(sig) do 
             stop
+            old.call
           end
         end
       end
