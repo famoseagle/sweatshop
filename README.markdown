@@ -5,10 +5,10 @@ Currently, it runs rabbitmq and kestrel, but it can support any number of queues
 
 ## Installing 
 
-   gem install sweat_shop
-   freeze in your rails directory
-   cd vendor/gems/sweat_shop
-   rake setup
+    gem install sweat_shop
+    freeze in your rails directory
+    cd vendor/gems/sweat_shop
+    rake setup
 
 ## Writing workers
 
@@ -63,7 +63,7 @@ If you would like to run SweatShop as a daemon on a linux machine, use the initd
 
     i_can_daemonize
     memcache (for kestrel)
-    mq (for rabbit)
+    carrot (for rabbit)
 
 # LICENSE
 
