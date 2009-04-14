@@ -10,25 +10,51 @@ module MessageQueue
     end
 
     def delete(queue)
-      client.queue(queue).delete
+      send_command do
+        client.queue(queue).delete
+      end
     end
 
     def queue_size(queue)
-      client.queue(queue).message_count
+      send_command do
+        client.queue(queue).message_count
+      end
     end
 
     def enqueue(queue, data)
-      client.queue(queue, :durable => true).publish(Marshal.dump(data), :persistent => true)
+      send_command do 
+        client.queue(queue, :durable => true).publish(Marshal.dump(data), :persistent => true)
+      end
     end
 
     def dequeue(queue)
-      task = client.queue(queue).pop(:ack => true)
-      return unless task
-      Marshal.load(task)
+      send_command do
+        task = client.queue(queue).pop(:ack => true)
+        return unless task
+        Marshal.load(task)
+      end
     end
 
     def confirm(queue)
-      client.queue(queue).ack
+      send_command do
+        client.queue(queue).ack
+      end
+    end
+
+    def send_command(&block)
+      retried = false
+      begin
+        block.call
+      rescue Carrot::AMQP::Server::ServerDown => e
+        if not retried
+          puts "Error #{e.message}. Retrying..."
+          @client = nil
+          retried = true
+          retry
+        else
+          raise e
+        end
+      end
     end
 
     def client
