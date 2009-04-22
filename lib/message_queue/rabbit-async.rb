@@ -4,7 +4,7 @@ module MessageQueue
     attr_accessor :em_thread
 
     def initialize(opts={})
-      @servers = opts[:servers]
+      @servers = opts['servers']
       @info = {}
       @host, @port = @servers.first.split(':')
       @port = @port.to_i

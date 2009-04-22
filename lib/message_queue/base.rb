@@ -1,6 +1,6 @@
 module MessageQueue
   class Base
-    attr_reader :servers
+    attr_reader :opts
     def queue_size(queue);    end
     def enqueue(queue, data); end
     def dequeue(queue);       end

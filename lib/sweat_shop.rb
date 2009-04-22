@@ -111,7 +111,7 @@ module SweatShop
     @queue ||= begin 
       queue = config['queue'] || 'rabbit'
       queue = constantize("MessageQueue::#{queue.capitalize}")
-      queue.new(:servers => config['servers'])
+      queue.new(config)
     end
   end
 

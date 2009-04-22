@@ -1,9 +1,7 @@
 module MessageQueue
   class Kestrel < Base
-    attr_reader :client, :servers
-
     def initialize(opts)
-      @servers = opts[:servers]
+      @servers = opts['servers']
     end
 
     def queue_size(queue)

@@ -3,3 +3,6 @@ servers:
   - localhost:5672
 enable: true
 queue: rabbit
+user: 'guest'
+pass: 'guest'
+vhost: '/'
