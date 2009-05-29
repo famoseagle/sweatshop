@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{sweat_shop}
-  s.version = "0.8.1"
+  s.version = "0.8.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Amos Elliston"]
@@ -52,8 +52,14 @@ Gem::Specification.new do |s|
     s.specification_version = 2
 
     if current_version >= 3 then
+      s.add_runtime_dependency(%q<famoseagle-carrot>, ["= 0.6.0"])
+      s.add_runtime_dependency(%q<wonko9-i_can_daemonize>, ["= 0.7.1"])
     else
+      s.add_dependency(%q<famoseagle-carrot>, ["= 0.6.0"])
+      s.add_dependency(%q<wonko9-i_can_daemonize>, ["= 0.7.1"])
     end
   else
+    s.add_dependency(%q<famoseagle-carrot>, ["= 0.6.0"])
+    s.add_dependency(%q<wonko9-i_can_daemonize>, ["= 0.7.1"])
   end
 end
