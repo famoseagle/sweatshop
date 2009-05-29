@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.2.0}
   s.summary = %q{SweatShop is a simple asynchronous worker queue build on top of rabbitmq/ampq}
+  s.add_dependency('famoseagle-carrot', '= 0.6.0')
+  s.add_dependency('wonko9-i_can_daemonize', '= 0.7.1')
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
