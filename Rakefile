@@ -13,6 +13,8 @@ begin
     s.description = "TODO"
     s.authors = ["Amos Elliston"]
     s.files =  FileList["[A-Z]*", "{lib,test,config}/**/*"]
+    s.add_dependency('famoseagle-carrot', '= 0.6.0')
+    s.add_dependency('wonko9-i_can_daemonize', '= 0.7.1')
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
