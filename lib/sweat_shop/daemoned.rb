@@ -395,7 +395,7 @@ module Daemoned
     end
 
     def pid_file
-      options[:pid_file] ||= File.expand_path("#{pid_dir}/#{script_name}.#{$$}.pid")
+      options[:pid_file] ||= File.expand_path("#{pid_dir}/#{script_name}.pid")
     end
     
     def pid

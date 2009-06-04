@@ -38,6 +38,7 @@ module SweatShop
       puts "Received HUP"
       SweatShop.stop
 
+      remove_pid!
       puts "Restarting sweatd with #{start_cmd}..."
       puts `#{start_cmd}`        
 
