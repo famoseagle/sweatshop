@@ -22,7 +22,11 @@ INSTANCES=3
 export RAILS_ENV=dev
 
 # Gracefully exit if the package has been removed.
-test -x $DAEMON || exit 0
+if [ ! -x $DAEMON ]; then
+  echo "$DAEMON does not exist"
+  exit 0
+fi;
+
 
 function start() {
   num=$1

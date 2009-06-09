@@ -39,7 +39,7 @@ module SweatShop
       remove_pid!
       puts "Restarting sweatd with #{start_cmd}..."
       `#{start_cmd}`        
-      exit ($? == 0 ? 0 : 1)
+      exit $?.exitstatus
     end
     
     before do
