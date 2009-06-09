@@ -2,12 +2,14 @@
 
 if ARGV.include?('-d')
   ARGV.delete('-d')
-  ARGV.unshift('start') unless ARGV.include?('stop')
+  ARGV.unshift('start') unless ARGV.detect{|a| ['start', 'restart'].include?(a)}
 
   root = File.expand_path(File.dirname(__FILE__) + '/..')
   ARGV << "--rails=#{root}"
 
   system("ruby #{root}/vendor/gems/sweat_shop/lib/sweat_shop/sweatd.rb #{ARGV.join(' ')}")
+  returnval = $? == 0 ? 0 : 1
+  exit returnval
 else
   puts "Loading Rails..."
   require File.dirname(__FILE__) + '/../config/environment'

@@ -281,15 +281,15 @@ module Daemoned
 
     def stop
       puts "Stopping #{script_name}..."
+      if pid.nil?
+        $stderr.puts "#{script_name} doesn't appear to be running"
+        exit(1)
+      end
       kill
-      exit(1)
+      exit
     end     
 
     def kill(signal = 'TERM')
-      if pid.nil?
-        $stderr.puts "#{script_name} doesn't appear to be running"
-        return
-      end
       $stdout.puts("Stopping pid #{pid} with #{signal}...")
       begin
         Process.kill(signal, pid)             

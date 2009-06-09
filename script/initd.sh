@@ -14,8 +14,9 @@ fi
 
 DAEMON=/opt/current/script/sweatshop
 NAME=sweatshop
-LOG_FILE=/opt/log/sweatshop.log
-QUEUE_GROUPS=test
+PID_DIR=/opt/current/log
+LOG_FILE=$PID_DIR/sweatshop.log
+#QUEUE_GROUPS=test
 INSTANCES=3
 
 export RAILS_ENV=dev
@@ -26,11 +27,11 @@ test -x $DAEMON || exit 0
 function start() {
   num=$1
   pidfile=$PID_DIR/$NAME.$num.pid
-  echo -n $"Starting ${NAME}:${num} "
+  echo $"Starting ${NAME}:${num} "
   if [ -z $QUEUE_GROUPS ]; then
-    $DAEMON -d start --log-file $LOG_FILE --pid-file $PID_FILE 
+    $DAEMON -d start --log-file $LOG_FILE --pid-file $pidfile 
   else
-    $DAEMON -d start --log-file $LOG_FILE --pid-file $PID_FILE --groups $QUEUE_GROUPS
+    $DAEMON -d start --log-file $LOG_FILE --pid-file $pidfile --groups $QUEUE_GROUPS
   fi
   RETVAL=$?
   [ $RETVAL -eq 0 ] && success || failure
@@ -41,7 +42,7 @@ function start() {
 function stop() {
   num=$1
   pidfile=$PID_DIR/$NAME.$num.pid
-  echo -n $"Stopping ${NAME}:${num}: "
+  echo $"Stopping ${NAME}:${num}: "
   $DAEMON -d stop --log-file $LOG_FILE --pid-file $pidfile
   RETVAL=$?
   [ $RETVAL -eq 0 ] && success || failure
@@ -52,7 +53,7 @@ function stop() {
 function restart() {
   num=$1
   pidfile=$PID_DIR/$NAME.$num.pid
-  echo -n $"Restarting ${NAME}:${num}: "
+  echo $"Restarting ${NAME}:${num}: "
   $DAEMON -d restart --log-file $LOG_FILE --pid-file $pidfile
   RETVAL=$?
   [ $RETVAL -eq 0 ] && success || failure

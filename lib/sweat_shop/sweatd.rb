@@ -1,4 +1,3 @@
-require File.dirname(__FILE__) + '/../sweat_shop'
 require File.dirname(__FILE__) + '/daemoned'
 
 module SweatShop
@@ -40,7 +39,8 @@ module SweatShop
       remove_pid!
       puts "Restarting sweatd with #{start_cmd}..."
       `#{start_cmd}`        
-      exit(1)
+      returnval = $? == 0 ? 0 : 1
+      exit returnval
     end
     
     before do
@@ -48,6 +48,7 @@ module SweatShop
         puts "Loading Rails..."
         require rails_root + '/config/environment' 
       end
+      require File.dirname(__FILE__) + '/../sweat_shop'
     end
 
     daemonize(:kill_timeout => 20) do
