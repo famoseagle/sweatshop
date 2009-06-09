@@ -76,9 +76,10 @@ module Daemoned
       
       if ARGV.include?('stop')                                                         
         stop
-      elsif ARGV.include?('start') or ontop?
-        self.running   = true
-      else
+      elsif ARGV.include?('restart')
+        kill('HUP')
+        exit(1)
+      elsif not ARGV.include?('start') and not ontop?
         puts opts.help
       end
     end    
@@ -181,7 +182,7 @@ module Daemoned
           open(pid_file, 'w'){|f| f << Process.pid }
           at_exit { remove_pid! }
     
-          trap('TERM') { callback!(:sig_term) ; self.running = false     }
+          trap('TERM') { callback!(:sig_term)                            }
           trap('INT')  { callback!(:sig_int)  ; Process.kill('TERM', $$) }
           trap('HUP')  { callback!(:sig_hup)                             }
 
@@ -211,8 +212,6 @@ module Daemoned
     
     def run_block(&block)
       loop do
-        break unless running?
-
         if options[:timeout]
           begin
             Timeout::timeout(options[:timeout].to_i) do
@@ -268,7 +267,6 @@ module Daemoned
     end
 
     def ok_to_start?
-      return false unless running?
       return true if pid.nil?
 
       if process_alive?
@@ -282,16 +280,16 @@ module Daemoned
     end
 
     def stop
-      self.running = false      
       puts "Stopping #{script_name}..."
-      if pid.nil?
-        $stderr.puts "#{script_name} doesn't appear to be running"
-        exit(1)
-      end
       kill
+      exit(1)
     end     
 
     def kill(signal = 'TERM')
+      if pid.nil?
+        $stderr.puts "#{script_name} doesn't appear to be running"
+        return
+      end
       $stdout.puts("Stopping pid #{pid} with #{signal}...")
       begin
         Process.kill(signal, pid)             
@@ -311,12 +309,11 @@ module Daemoned
       if time_to_wait > 0.5
         times_to_check = (time_to_wait / 0.5).to_i
       end
-      alive = false
       times_to_check.times do
-        alive = process_alive?
+        return false unless process_alive?
         sleep 0.5
       end
-      alive
+      true
     end
           
     def safefork(&block)
@@ -357,15 +354,9 @@ module Daemoned
     end
 
     def remove_pid!
-      File.unlink(pid_file) if File.file?(pid_file)
-    end
-
-    def running?
-      @running || false
-    end
-
-    def running=(bool)
-      @running = bool
+      if File.file?(pid_file) and File.read(pid_file).to_i == $$
+        File.unlink(pid_file)
+      end
     end
 
     def ontop?

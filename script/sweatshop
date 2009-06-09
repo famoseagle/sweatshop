@@ -7,12 +7,7 @@ if ARGV.include?('-d')
   root = File.expand_path(File.dirname(__FILE__) + '/..')
   ARGV << "--rails=#{root}"
 
-  # for frozen gems..
-  Dir.glob(root + '/vendor/gems/**/lib') do |lib|
-    $:.unshift(lib)
-  end
-
-  require 'sweat_shop/sweatd'
+  system("ruby #{root}/vendor/gems/sweat_shop/lib/sweat_shop/sweatd.rb #{ARGV.join(' ')}")
 else
   puts "Loading Rails..."
   require File.dirname(__FILE__) + '/../config/environment'

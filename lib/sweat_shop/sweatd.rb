@@ -37,12 +37,10 @@ module SweatShop
     sig(:hup) do
       puts "Received HUP"
       SweatShop.stop
-
-      kill
-      at_exit{
-        puts "Restarting sweatd with #{start_cmd}..."
-        puts `#{start_cmd}`        
-      }
+      remove_pid!
+      puts "Restarting sweatd with #{start_cmd}..."
+      `#{start_cmd}`        
+      exit(1)
     end
     
     before do
