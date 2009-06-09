@@ -78,7 +78,7 @@ module Daemoned
         stop
       elsif ARGV.include?('restart')
         kill('HUP')
-        exit(1)
+        exit
       elsif not ARGV.include?('start') and not ontop?
         puts opts.help
       end

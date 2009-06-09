@@ -8,8 +8,7 @@ if ARGV.include?('-d')
   ARGV << "--rails=#{root}"
 
   system("ruby #{root}/vendor/gems/sweat_shop/lib/sweat_shop/sweatd.rb #{ARGV.join(' ')}")
-  returnval = $? == 0 ? 0 : 1
-  exit returnval
+  exit ($? == 0 ? 0 : 1)
 else
   puts "Loading Rails..."
   require File.dirname(__FILE__) + '/../config/environment'

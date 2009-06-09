@@ -39,8 +39,7 @@ module SweatShop
       remove_pid!
       puts "Restarting sweatd with #{start_cmd}..."
       `#{start_cmd}`        
-      returnval = $? == 0 ? 0 : 1
-      exit returnval
+      exit ($? == 0 ? 0 : 1)
     end
     
     before do
