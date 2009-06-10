@@ -47,6 +47,9 @@ module SweatShop
           end
         end
         if stop?
+          workers.each do |worker|
+            worker.stop
+          end
           queue.stop
           exit 
         end

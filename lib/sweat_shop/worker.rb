@@ -126,6 +126,14 @@ module SweatShop
       end
     end
 
+    def self.stop
+      instance.stop
+    end
+
+    # called before we exit -- subclass can implement this method 
+    def stop; end;
+
+
     def self.queue_group(group=nil)
       group ? meta_def(:_queue_group){ group } : _queue_group
     end
