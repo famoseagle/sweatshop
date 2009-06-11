@@ -54,7 +54,7 @@ function stop() {
   return $RETVAL
 }
 
-function restart() {
+function reload() {
   num=$1
   pidfile=$PID_DIR/$NAME.$num.pid
   echo $"Restarting ${NAME}:${num}: "
@@ -88,13 +88,18 @@ case "$1" in
     doAll stop
     ;;
   restart)
-    doAll restart
+    doAll stop
+    sleep 1
+    doAll start
+    ;;
+  reload)
+    doAll reload
     ;;
   zap)
     doAll zap
     ;;
   *)
-    echo "Usage: $0 {start|stop|restart|zap}"
+    echo "Usage: $0 {start|stop|restart|reload|zap}"
     exit 1
 esac
 
