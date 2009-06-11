@@ -76,7 +76,7 @@ module Daemoned
       
       if ARGV.include?('stop')                                                         
         stop
-      elsif ARGV.include?('restart')
+      elsif ARGV.include?('reload')
         kill('HUP')
         exit
       elsif not ARGV.include?('start') and not ontop?
@@ -281,15 +281,15 @@ module Daemoned
 
     def stop
       puts "Stopping #{script_name}..."
-      if pid.nil?
-        $stderr.puts "#{script_name} doesn't appear to be running"
-        exit(1)
-      end
       kill
       exit
     end     
 
     def kill(signal = 'TERM')
+      if pid.nil?
+        $stderr.puts "#{script_name} doesn't appear to be running"
+        exit(1)
+      end
       $stdout.puts("Stopping pid #{pid} with #{signal}...")
       begin
         Process.kill(signal, pid)             

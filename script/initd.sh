@@ -16,10 +16,12 @@ DAEMON=/opt/current/script/sweatshop
 NAME=sweatshop
 PID_DIR=/opt/current/log
 LOG_FILE=$PID_DIR/sweatshop.log
-#QUEUE_GROUPS=test
 INSTANCES=3
-
+#QUEUE_GROUPS=test
 export RAILS_ENV=dev
+
+[ -f /etc/sysconfig/${NAME} ] && . /etc/sysconfig/${NAME}
+
 
 # Gracefully exit if the package has been removed.
 if [ ! -x $DAEMON ]; then
@@ -57,8 +59,8 @@ function stop() {
 function reload() {
   num=$1
   pidfile=$PID_DIR/$NAME.$num.pid
-  echo $"Restarting ${NAME}:${num}: "
-  $DAEMON -d restart --log-file $LOG_FILE --pid-file $pidfile
+  echo $"Reloading ${NAME}:${num}: "
+  $DAEMON -d reload --log-file $LOG_FILE --pid-file $pidfile
   RETVAL=$?
   [ $RETVAL -eq 0 ] && success || failure
   echo
