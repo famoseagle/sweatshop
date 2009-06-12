@@ -290,9 +290,10 @@ module Daemoned
         $stderr.puts "#{script_name} doesn't appear to be running"
         exit(1)
       end
-      $stdout.puts("Stopping pid #{pid} with #{signal}...")
+      $stdout.puts("Sending pid #{pid} signal #{signal}...")
       begin
         Process.kill(signal, pid)             
+        return if signal == 'HUP' 
         if pid_running?(options[:kill_timeout] || 120)
           $stdout.puts("Using kill -9 #{pid}")
           Process.kill(9, pid)
