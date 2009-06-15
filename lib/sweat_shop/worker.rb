@@ -95,7 +95,7 @@ module SweatShop
     end
 
     def self.queue
-      SweatShop.queue(queue_group)
+      SweatShop.queue(queue_group.to_s)
     end
 
     def self.workers
