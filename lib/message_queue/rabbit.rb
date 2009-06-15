@@ -3,10 +3,7 @@ module MessageQueue
   class Rabbit < Base
 
     def initialize(opts={})
-      @servers     = opts['servers']
-      @host, @port = @servers.first.split(':')
-      @port        = @port.to_i
-      @opts        = opts
+      @opts = opts
     end
 
     def delete(queue)
@@ -59,8 +56,8 @@ module MessageQueue
 
     def client
       @client ||= Carrot.new(
-        :host  => @host, 
-        :port  => @port, 
+        :host  => @opts['host'], 
+        :port  => @opts['port'].to_i, 
         :user  => @opts['user'], 
         :pass  => @opts['pass'], 
         :vhost => @opts['vhost']
