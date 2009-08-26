@@ -56,11 +56,12 @@ module MessageQueue
 
     def client
       @client ||= Carrot.new(
-        :host  => @opts['host'], 
-        :port  => @opts['port'].to_i, 
-        :user  => @opts['user'], 
-        :pass  => @opts['pass'], 
-        :vhost => @opts['vhost']
+        :host   => @opts['host'], 
+        :port   => @opts['port'].to_i, 
+        :user   => @opts['user'], 
+        :pass   => @opts['pass'], 
+        :vhost  => @opts['vhost'],
+        :insist => @opts['insist']
       ) 
     end
 
