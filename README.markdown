@@ -6,7 +6,7 @@ Currently, it runs rabbitmq and kestrel, but it can support any number of queues
 ## Installing 
 
     gem install sweat_shop
-    freeze in your rails directory
+    freeze in your gems directory (add config.gem 'sweat_shop' to your environment)
     cd vendor/gems/sweat_shop
     rake setup
 
@@ -14,7 +14,7 @@ Currently, it runs rabbitmq and kestrel, but it can support any number of queues
 
 Put `email_worker.rb` into app/workers and sublcass `SweatShop::Worker`:
 
-    class EmailWorker
+    class EmailWorker < SweatShop::Worker
       def send_mail(to)
         user = User.find_by_id(to)
         Mailer.deliver_welcome(to)

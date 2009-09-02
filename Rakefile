@@ -12,7 +12,7 @@ begin
     s.homepage = "http://github.com/famoseagle/sweat-shop"
     s.description = "TODO"
     s.authors = ["Amos Elliston"]
-    s.files =  FileList["[A-Z]*", "{lib,test,config}/**/*"]
+    s.files =  FileList["[A-Z]*", "install.rb", "{lib,test,config}/**/*"]
     s.add_dependency('famoseagle-carrot', '= 0.7.0')
   end
 rescue LoadError
