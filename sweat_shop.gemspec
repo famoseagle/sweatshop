@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{sweat_shop}
-  s.version = "1.2.0"
+  s.version = "1.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Amos Elliston"]
@@ -30,6 +30,10 @@ Gem::Specification.new do |s|
      "lib/sweat_shop/metaid.rb",
      "lib/sweat_shop/sweatd.rb",
      "lib/sweat_shop/worker.rb",
+     "script/initd.sh",
+     "script/kestrel",
+     "script/kestrel.sh",
+     "script/sweatshop",
      "test/hello_worker.rb",
      "test/test_functional_worker.rb",
      "test/test_helper.rb",
