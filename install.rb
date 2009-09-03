@@ -18,5 +18,3 @@ script = 'sweatshop'
 FileUtils.cp(File.join(root, 'config', config), File.join(RAILS_ROOT, 'config', config))
 FileUtils.cp(File.join(root, 'script', script), File.join(RAILS_ROOT, 'script', script))
 puts "\n\ninstalled #{ [config, script].join(", ") } \n\n"
-
-puts IO.read(File.join(root, 'README.txt'))
