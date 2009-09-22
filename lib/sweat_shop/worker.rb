@@ -74,24 +74,21 @@ module SweatShop
     end
 
     def self.do_task(task)
-      call_before_task(task)
+      begin
+        call_before_task(task)
 
-      queued_at = task[:queued_at] ? "(queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" : ''
-      log("Dequeuing #{queue_name}::#{task[:method]} #{queued_at}")
-      task[:result] = instance.send(task[:method], *task[:args])
+        queued_at = task[:queued_at] ? "(queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" : ''
+        log("Dequeuing #{queue_name}::#{task[:method]} #{queued_at}")
+        task[:result] = instance.send(task[:method], *task[:args])
 
-      call_after_task(task)
-      confirm
-    end
-
-    def self.call_before_task(task)
-      superclass.call_before_task(task) if superclass.respond_to?(:call_before_task)
-      before_task.call(task) if before_task
-    end
-
-    def self.call_after_task(task)
-      superclass.call_after_task(task) if superclass.respond_to?(:call_after_task)
-      after_task.call(task) if after_task
+        call_after_task(task)
+        confirm
+      rescue SystemExit
+        exit
+      rescue Exception => e
+        log("Caught Exception: #{e.message}, \n#{e.backtrace.join("\n")}")
+        call_exception_handler(e)
+      end
     end
 
     def self.queue
@@ -110,6 +107,21 @@ module SweatShop
       SweatShop.log(msg)
     end
 
+    def self.call_before_task(task)
+      superclass.call_before_task(task) if superclass.respond_to?(:call_before_task)
+      before_task.call(task) if before_task
+    end
+
+    def self.call_after_task(task)
+      superclass.call_after_task(task) if superclass.respond_to?(:call_after_task)
+      after_task.call(task) if after_task
+    end
+
+    def self.call_exception_handler(exception)
+      superclass.call_exception_handler(exception) if superclass.respond_to?(:call_exception_handler)
+      on_exception.call(exception) if on_exception
+    end
+
     def self.before_task(&block)
       if block
         @before_task = block
@@ -123,6 +135,14 @@ module SweatShop
         @after_task = block
       else
         @after_task
+      end
+    end
+
+    def self.on_exception(&block)
+      if block
+        @on_exception = block
+      else
+        @on_exception
       end
     end
 

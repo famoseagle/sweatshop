@@ -12,14 +12,15 @@ class WorkerTest < Test::Unit::TestCase
     File.delete(HelloWorker::TEST_FILE) if File.exist?(HelloWorker::TEST_FILE)
   end
 
-  test "daemon" do
+  should "daemonize" do
     begin
-      SweatShop.queue = nil
+      SweatShop.config['enable'] = true
       SweatShop.logger = :silent
+
+      HelloWorker.async_hello('Amos')
 
       worker = File.expand_path(File.dirname(__FILE__) + '/hello_worker')
       sweatd = "#{File.dirname(__FILE__)}/../lib/sweat_shop/sweatd.rb" 
-      uid = HelloWorker.async_hello('Amos')
 
       `ruby #{sweatd} --worker-file #{worker} start`
       `ruby #{sweatd} stop`
