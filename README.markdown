@@ -3,7 +3,7 @@
 SweatShop provides an api to background resource intensive tasks. Much of the api design was copied from Workling, with a few tweaks.
 Currently, it runs rabbitmq and kestrel, but it can support any number of queues.
 
-## Installing 
+## Installing
 
     gem install sweat_shop
     freeze in your gems directory (add config.gem 'sweat_shop' to your environment)
@@ -32,7 +32,7 @@ call:
 
 That will do the work immediately, without placing the task on the queue. You can also define a `queue_group` at the top of the file
 which will allow you to split workers out into logical groups. This is important if you have various machines serving different
-queues. 
+queues.
 
 ## Running the queue
 
@@ -44,7 +44,43 @@ http://github.com/robey/kestrel/tree/master
 Rabbit:
 http://github.com/ezmobius/nanite/tree/master
 
-config/sweatshop.yml specifies the machine address of the queue (default localhost:5672). You can also specify the queue type with the queue param.
+config/sweatshop.yml specifies the machine address of the queue
+(default localhost:5672). You can also specify the queue type with the
+queue param.
+
+## Rabbit cluster support
+
+The following example configuration shows support for Rabbit clusters
+within a queue group:
+
+        default:
+          queue: rabbit
+          cluster:
+            - host: hostA
+              port: 5672
+            - host: hostB
+              port: 5672
+          user: 'guest'
+          pass: 'guest'
+          vhost: '/'
+        enable: true
+
+Sweatshop will attempt to connect to each server listed under
+"cluster" in order, until it either manages to establish a connection
+or until it runs out of servers.
+
+If you only have a single Rabbit server, you can omit the "cluster"
+option and just add "host" and "port" options, as shown below:
+
+       default:
+         queue: rabbit
+         host: localhost
+         port: 5672
+         user: 'guest'
+         pass: 'guest'
+         vhost: '/'
+       enable: true
+
 
 ## Running the workers
 

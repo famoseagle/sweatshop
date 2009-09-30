@@ -9,7 +9,22 @@ class WorkerTest < Test::Unit::TestCase
   end
 
   def teardown
+    SweatShop.instance_variable_set("@config", nil)
+    SweatShop.instance_variable_set("@queues", nil)
     File.delete(HelloWorker::TEST_FILE) if File.exist?(HelloWorker::TEST_FILE)
+  end
+
+  def send_message
+    HelloWorker.async_hello('Amos')
+
+    worker = File.expand_path(File.dirname(__FILE__) + '/hello_worker')
+    sweatd = "#{File.dirname(__FILE__)}/../lib/sweat_shop/sweatd.rb"
+
+    `ruby #{sweatd} --worker-file #{worker} start`
+    `ruby #{sweatd} stop`
+
+    File.delete('sweatd.log') if File.exist?('sweatd.log')
+    assert_equal 'Hi, Amos', File.read(HelloWorker::TEST_FILE)
   end
 
   should "daemonize" do
@@ -17,21 +32,31 @@ class WorkerTest < Test::Unit::TestCase
       SweatShop.config['enable'] = true
       SweatShop.logger = :silent
 
-      HelloWorker.async_hello('Amos')
+      send_message
 
-      worker = File.expand_path(File.dirname(__FILE__) + '/hello_worker')
-      sweatd = "#{File.dirname(__FILE__)}/../lib/sweat_shop/sweatd.rb" 
-
-      `ruby #{sweatd} --worker-file #{worker} start`
-      `ruby #{sweatd} stop`
-
-      File.delete('sweatd.log') if File.exist?('sweatd.log')
-      assert_equal 'Hi, Amos', File.read(HelloWorker::TEST_FILE)
     rescue Exception => e
       puts e.message
       puts e.backtrace.join("\n")
       fail "\n\n*** Functional test failed, is the rabbit server running on localhost? ***\n"
     end
   end
-  
+
+  should "connect to fallback servers if the default one is down" do
+    begin
+      SweatShop.config['enable'] = true
+
+      SweatShop.config['default']['cluster'] =
+        [
+         { 'host' => 'localhost', 'port' => 5671}, #invalid
+         { 'host' => 'localhost', 'port' => 5672} #valid
+        ]
+
+      send_message
+    rescue Exception => e
+      puts e.message
+      puts e.backtrace.join("\n")
+      fail "\n\n*** Functional test failed, is the rabbit server running on localhost? ***\n"
+    end
+  end
+
 end

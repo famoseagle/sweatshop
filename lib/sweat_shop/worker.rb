@@ -10,7 +10,7 @@ module SweatShop
       if method.to_s =~ /^async_(.*)/
         method        = $1
         expected_args = instance.method(method).arity
-        if expected_args != args.size 
+        if expected_args != args.size
           raise ArgumentError.new("#{method} expects #{expected_args} arguments")
         end
         return instance.send(method, *args) unless config['enable']
@@ -66,7 +66,7 @@ module SweatShop
         do_task(task)
       end
     end
-    
+
     def self.do_tasks
       while task = dequeue
         do_task(task)
@@ -150,7 +150,7 @@ module SweatShop
       instance.stop
     end
 
-    # called before we exit -- subclass can implement this method 
+    # called before we exit -- subclass can implement this method
     def stop; end;
 
 

@@ -19,7 +19,7 @@ module MessageQueue
     end
 
     def enqueue(queue, data)
-      send_command do 
+      send_command do
         client.queue(queue, :durable => true).publish(Marshal.dump(data), :persistent => true)
       end
     end
@@ -55,14 +55,36 @@ module MessageQueue
     end
 
     def client
-      @client ||= Carrot.new(
-        :host   => @opts['host'], 
-        :port   => @opts['port'].to_i, 
-        :user   => @opts['user'], 
-        :pass   => @opts['pass'], 
-        :vhost  => @opts['vhost'],
-        :insist => @opts['insist']
-      ) 
+      if @opts['cluster']
+        @opts['cluster'].each_with_index do |server, i|
+          begin
+            @client ||= Carrot.new(
+              :host => server['host'],
+              :port => server['port'].to_i,
+              :user => @opts['user'],
+              :pass => @opts['pass'],
+              :vhost => @opts['vhost'],
+              :insist => @opts['insist']
+            )
+          rescue Carrot::AMQP::Server::ServerDown => e
+            if i == (@opts['cluster'].size-1)
+              raise e
+            else
+              next
+            end
+          end
+        end
+      else
+        @client ||= Carrot.new(
+          :host   => @opts['host'],
+          :port   => @opts['port'].to_i,
+          :user   => @opts['user'],
+          :pass   => @opts['pass'],
+          :vhost  => @opts['vhost'],
+          :insist => @opts['insist']
+        )
+      end
+      @client
     end
 
     def stop
