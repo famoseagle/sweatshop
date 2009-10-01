@@ -55,17 +55,21 @@ module MessageQueue
     end
 
     def client
+      return @client if @client
+
       if @opts['cluster']
         @opts['cluster'].each_with_index do |server, i|
+          host, port = server.split(':')
           begin
-            @client ||= Carrot.new(
-              :host => server['host'],
-              :port => server['port'].to_i,
-              :user => @opts['user'],
-              :pass => @opts['pass'],
-              :vhost => @opts['vhost'],
+            @client = Carrot.new(
+              :host   => host,
+              :port   => port.to_i,
+              :user   => @opts['user'],
+              :pass   => @opts['pass'],
+              :vhost  => @opts['vhost'],
               :insist => @opts['insist']
             )
+            return @client
           rescue Carrot::AMQP::Server::ServerDown => e
             if i == (@opts['cluster'].size-1)
               raise e
@@ -75,9 +79,15 @@ module MessageQueue
           end
         end
       else
-        @client ||= Carrot.new(
-          :host   => @opts['host'],
-          :port   => @opts['port'].to_i,
+        if @opts['host'] =~ /:/
+          host, port = @opts['host'].split(':')
+        else
+          host = @opts['host']
+          port = @opts['port']
+        end
+        @client = Carrot.new(
+          :host   => host,
+          :port   => port.to_i,
           :user   => @opts['user'],
           :pass   => @opts['pass'],
           :vhost  => @opts['vhost'],
@@ -85,6 +95,10 @@ module MessageQueue
         )
       end
       @client
+    end
+
+    def client=(client)
+      @client = client
     end
 
     def stop

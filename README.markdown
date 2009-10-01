@@ -56,10 +56,8 @@ within a queue group:
         default:
           queue: rabbit
           cluster:
-            - host: hostA
-              port: 5672
-            - host: hostB
-              port: 5672
+            - hostA:5672
+            - hostB:5672
           user: 'guest'
           pass: 'guest'
           vhost: '/'
@@ -70,7 +68,7 @@ Sweatshop will attempt to connect to each server listed under
 or until it runs out of servers.
 
 If you only have a single Rabbit server, you can omit the "cluster"
-option and just add "host" and "port" options, as shown below:
+option and just add "host" and "port" (or host: localhost:5672) options, as shown below:
 
        default:
          queue: rabbit
@@ -97,7 +95,6 @@ If you would like to run SweatShop as a daemon on a linux machine, use the initd
 
 # REQUIREMENTS
 
-    i_can_daemonize
     memcache (for kestrel)
     carrot (for rabbit)
 

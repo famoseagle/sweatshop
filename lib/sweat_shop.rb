@@ -111,13 +111,15 @@ module SweatShop
   end
 
   def queue(type = 'default')
+    type = config[type] ? type : 'default'
     @queues ||= {}
-    @queues[type] ||= begin 
-      qconfig = config[type] || config['default']
-      qtype   = qconfig['queue'] || 'rabbit'
-      queue   = constantize("MessageQueue::#{qtype.capitalize}")
-      queue.new(qconfig)
-    end
+    return @queues[type] if @queues[type]
+
+    qconfig = config[type]
+    qtype   = qconfig['queue'] || 'rabbit'
+    queue   = constantize("MessageQueue::#{qtype.capitalize}")
+
+    @queues[type] = queue.new(qconfig)
   end
 
   def queue=(queue, type = 'default')

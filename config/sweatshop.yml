@@ -1,18 +1,15 @@
 development:
   default:
     queue: rabbit
-    host: localhost 
-    port: 5672
+    host: localhost:5672
   enable: true
 test:
   default:
     queue: rabbit
-    host: localhost 
-    port: 5672
+    host: localhost:5672
   enable: true
 production:
   default:
     queue: rabbit
-    host: localhost 
-    port: 5672
+    host: localhost:5672
   enable: true
