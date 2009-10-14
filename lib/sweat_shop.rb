@@ -103,27 +103,57 @@ module SweatShop
     end
   end
 
-  def pp_sizes
-    max_width = workers.collect{|w| w.to_s.size}.max
-    puts '-' * (max_width + 10)
-    puts queue_sizes.collect{|p| sprintf("%-#{max_width}s %2s", p.first, p.last)}.join("\n")
-    puts '-' * (max_width + 10)
-  end
-
   def queue(type = 'default')
     type = config[type] ? type : 'default'
-    @queues ||= {}
-    return @queues[type] if @queues[type]
+    return queues[type] if queues[type]
 
     qconfig = config[type]
     qtype   = qconfig['queue'] || 'rabbit'
     queue   = constantize("MessageQueue::#{qtype.capitalize}")
 
-    @queues[type] = queue.new(qconfig)
+    queues[type] = queue.new(qconfig)
   end
 
   def queue=(queue, type = 'default')
-    @queues[type] = queue
+    queues[type] = queue
+  end
+
+  def queues
+    @queues ||= {}
+  end
+
+  def queue_groups
+    @queue_groups ||= workers.collect{|w| w.queue_group} << 'default'
+  end
+
+  def pp_sizes
+    max_width = workers.collect{|w| w.to_s.size}.max
+    puts '-' * (max_width + 10)
+    puts queue_sizes.collect{ |p| sprintf("%-#{max_width}s %2s", p.first, p.last) }.join("\n")
+    puts '-' * (max_width + 10)
+  end
+
+  def cluster_info
+    servers = []
+    queue_groups.each do |group|
+      qconfig = config[group]
+      next unless qconfig
+      next unless qconfig['cluster']
+      servers << qconfig['cluster']
+    end
+    servers.flatten!
+
+    servers.each do |server|
+      puts "\nQueue sizes on #{server}"
+      queue = MessageQueue::Rabbit.new('host' => server)
+      queue_groups.each do |group|
+        queues[group] = queue
+      end
+      pp_sizes
+      puts
+    end
+    @queues = {}
+    nil
   end
 
   def log(msg)
