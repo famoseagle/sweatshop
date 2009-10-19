@@ -10,11 +10,12 @@ begin
     s.summary = %Q{SweatShop is a simple asynchronous worker queue build on top of rabbitmq/ampq}
     s.email = "amos@geni.com"
     s.homepage = "http://github.com/famoseagle/sweat-shop"
-    s.description = "TODO"
+    s.description = "See summary"
     s.authors = ["Amos Elliston"]
     s.files =  FileList["[A-Z]*", "install.rb", "{lib,test,config,script}/**/*"]
     s.add_dependency('famoseagle-carrot', '= 0.7.0')
   end
+  Jeweler::GemcutterTasks.new
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
 end
