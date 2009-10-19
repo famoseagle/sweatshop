@@ -6,8 +6,8 @@ require 'rcov/rcovtask'
 begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
-    s.name = "sweat_shop"
-    s.summary = %Q{SweatShop is a simple asynchronous worker queue build on top of rabbitmq/ampq}
+    s.name = "sweatshop"
+    s.summary = %Q{Sweatshop is a simple asynchronous worker queue build on top of rabbitmq/ampq}
     s.email = "amos@geni.com"
     s.homepage = "http://github.com/famoseagle/sweat-shop"
     s.description = "See summary"
