@@ -6,9 +6,9 @@ $:.unshift(File.dirname(__FILE__))
 require 'message_queue/base'
 require 'message_queue/rabbit'
 require 'message_queue/kestrel'
-require 'sweat_shop/worker'
+require 'sweatshop/worker'
 
-module SweatShop
+module Sweatshop
   extend self
 
   def workers
@@ -31,30 +31,22 @@ module SweatShop
   end
 
   def do_tasks(workers)
-    if queue.subscribe?
-      EM.run do
-        workers.each do |worker|
-          worker.subscribe
+    loop do
+      wait = true
+      workers.each do |worker|
+        if task = worker.dequeue
+          worker.do_task(task)
+          wait = false
         end
       end
-    else
-      loop do
-        wait = true
+      if stop?
         workers.each do |worker|
-          if task = worker.dequeue
-            worker.do_task(task)
-            wait = false
-          end
+          worker.stop
         end
-        if stop?
-          workers.each do |worker|
-            worker.stop
-          end
-          queue.stop
-          exit 
-        end
-        sleep 1 if wait
+        queue.stop
+        exit 
       end
+      sleep 1 if wait
     end
   end
 
@@ -89,7 +81,7 @@ module SweatShop
 
   def stop
     @stop = true
-    queue.stop if queue.subscribe?
+    queue.stop
   end
 
   def stop?

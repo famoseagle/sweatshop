@@ -1,23 +1,23 @@
 require File.dirname(__FILE__) + '/test_helper'
-require File.dirname(__FILE__) + '/../lib/sweat_shop'
+require File.dirname(__FILE__) + '/../lib/sweatshop'
 
-class SweatShopTest < Test::Unit::TestCase
-  SweatShop.workers = []
+class SweatshopTest < Test::Unit::TestCase
+  Sweatshop.workers = []
 
-  class HelloWorker < SweatShop::Worker
+  class HelloWorker < Sweatshop::Worker
     def hello(name)
       "Hi, #{name}"
     end
   end
 
-  class GroupedWorker < SweatShop::Worker
+  class GroupedWorker < Sweatshop::Worker
     queue_group :foo
   end
 
   should "group workers" do
-    assert_equal [HelloWorker, GroupedWorker], SweatShop.workers_in_group(:all)
-    assert_equal [HelloWorker],   SweatShop.workers_in_group(:default)
-    assert_equal [GroupedWorker], SweatShop.workers_in_group(:foo)
+    assert_equal [HelloWorker, GroupedWorker], Sweatshop.workers_in_group(:all)
+    assert_equal [HelloWorker],   Sweatshop.workers_in_group(:default)
+    assert_equal [GroupedWorker], Sweatshop.workers_in_group(:foo)
   end
 
   should "synch call" do
@@ -26,8 +26,8 @@ class SweatShopTest < Test::Unit::TestCase
   end
 
   should "assign a uid" do
-    SweatShop.logger = :silent
-    SweatShop.config['enable'] = false
+    Sweatshop.logger = :silent
+    Sweatshop.config['enable'] = false
     uid = HelloWorker.async_hello('Amos')
     assert_not_nil uid
   end
@@ -47,7 +47,7 @@ class SweatShopTest < Test::Unit::TestCase
   end
 
   should "exception handler" do
-    SweatShop.logger = :silent
+    Sweatshop.logger = :silent
 
     exception = nil
     HelloWorker.on_exception do |e|
@@ -60,7 +60,7 @@ class SweatShopTest < Test::Unit::TestCase
 
   should "chain before tasks" do
     MESSAGES = []
-    class BaseWorker < SweatShop::Worker
+    class BaseWorker < Sweatshop::Worker
       before_task do |task|
         MESSAGES << 'base'
       end
@@ -72,7 +72,7 @@ class SweatShopTest < Test::Unit::TestCase
     end
     SubWorker.call_before_task('foo')
     assert_equal ['base', 'sub'], MESSAGES
-    SweatShop.workers.delete(BaseWorker)
-    SweatShop.workers.delete(SubWorker)
+    Sweatshop.workers.delete(BaseWorker)
+    Sweatshop.workers.delete(SubWorker)
   end
 end

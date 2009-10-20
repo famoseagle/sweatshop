@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/daemoned'
 
-module SweatShop
+module Sweatshop
   class Sweatd
     include Daemoned
     queues     = []
@@ -30,12 +30,12 @@ module SweatShop
 
     sig(:term, :int) do
       puts "Shutting down sweatd..."
-      SweatShop.stop
+      Sweatshop.stop
     end
 
     sig(:hup) do
       puts "Received HUP"
-      SweatShop.stop
+      Sweatshop.stop
       remove_pid!
       puts "Restarting sweatd with #{start_cmd}..."
       `#{start_cmd}`        
@@ -46,14 +46,14 @@ module SweatShop
         puts "Loading Rails..."
         require rails_root + '/config/environment' 
       end
-      require File.dirname(__FILE__) + '/../sweat_shop'
+      require File.dirname(__FILE__) + '/../sweatshop'
     end
 
     daemonize(:kill_timeout => 20) do
       workers = []
 
       if groups.any?
-        workers += SweatShop.workers_in_group(groups)
+        workers += Sweatshop.workers_in_group(groups)
       end
 
       if queues.any?
@@ -64,11 +64,11 @@ module SweatShop
         worker_str = workers.join(',')
         puts "Starting #{worker_str}..." 
         $0 = "Sweatd: #{worker_str}"
-        SweatShop.do_tasks(workers)
+        Sweatshop.do_tasks(workers)
       else
         puts "Starting all workers..." 
         $0 = 'Sweatd: all'
-        SweatShop.do_all_tasks
+        Sweatshop.do_all_tasks
       end
     end
 

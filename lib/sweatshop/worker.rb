@@ -1,6 +1,6 @@
 require File.dirname(__FILE__) + '/metaid'
 
-module SweatShop
+module Sweatshop
   class Worker
     def self.inherited(subclass)
       self.workers << subclass
@@ -34,7 +34,7 @@ module SweatShop
     end
 
     def self.config
-      SweatShop.config
+      Sweatshop.config
     end
 
     def self.queue_name
@@ -59,12 +59,6 @@ module SweatShop
 
     def self.confirm
       queue.confirm(queue_name)
-    end
-
-    def self.subscribe
-      queue.subscribe(queue_name) do |task|
-        do_task(task)
-      end
     end
 
     def self.do_tasks
@@ -92,19 +86,19 @@ module SweatShop
     end
 
     def self.queue
-      SweatShop.queue(queue_group.to_s)
+      Sweatshop.queue(queue_group.to_s)
     end
 
     def self.workers
-      SweatShop.workers
+      Sweatshop.workers
     end
 
     def self.config
-      SweatShop.config
+      Sweatshop.config
     end
 
     def self.log(msg)
-      SweatShop.log(msg)
+      Sweatshop.log(msg)
     end
 
     def self.call_before_task(task)

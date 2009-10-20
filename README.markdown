@@ -1,20 +1,20 @@
-# SweatShop
+# Sweatshop
 
-SweatShop provides an api to background resource intensive tasks. Much of the api design was copied from Workling, with a few tweaks.
+Sweatshop provides an api to background resource intensive tasks. Much of the api design was copied from Workling, with a few tweaks.
 Currently, it runs rabbitmq and kestrel, but it can support any number of queues.
 
 ## Installing
 
-    gem install sweat_shop
-    freeze in your gems directory (add config.gem 'sweat_shop' to your environment)
-    cd vendor/gems/sweat_shop
+    gem install sweatshop
+    freeze in your gems directory (add config.gem 'sweatshop' to your environment)
+    cd vendor/gems/sweatshop
     rake setup
 
 ## Writing workers
 
-Put `email_worker.rb` into app/workers and sublcass `SweatShop::Worker`:
+Put `email_worker.rb` into app/workers and sublcass `Sweatshop::Worker`:
 
-    class EmailWorker < SweatShop::Worker
+    class EmailWorker < Sweatshop::Worker
       def send_mail(to)
         user = User.find_by_id(to)
         Mailer.deliver_welcome(to)
@@ -36,7 +36,7 @@ queues.
 
 ## Running the queue
 
-SweatShop has been tested with Rabbit and Kestrel, but it will also work with Starling. Please use the following resources to install the server:
+Sweatshop has been tested with Rabbit and Kestrel, but it will also work with Starling. Please use the following resources to install the server:
 
 Kestrel:
 http://github.com/robey/kestrel/tree/master
@@ -91,7 +91,7 @@ By default, the script will run all workers defined in the app/workers dir. Ever
     script/sweatshop -d
     script/sweatshop -d stop
 
-If you would like to run SweatShop as a daemon on a linux machine, use the initd.sh script provided in the sweat_shop/script dir.
+If you would like to run Sweatshop as a daemon on a linux machine, use the initd.sh script provided in the sweatshop/script dir.
 
 # REQUIREMENTS
 

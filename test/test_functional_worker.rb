@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../lib/sweat_shop'
+require File.dirname(__FILE__) + '/../lib/sweatshop'
 require File.dirname(__FILE__) + '/test_helper'
 require File.dirname(__FILE__) + '/hello_worker'
 
@@ -9,20 +9,20 @@ class WorkerTest < Test::Unit::TestCase
   end
 
   def teardown
-    SweatShop.instance_variable_set("@config", nil)
-    SweatShop.instance_variable_set("@queues", nil)
+    Sweatshop.instance_variable_set("@config", nil)
+    Sweatshop.instance_variable_set("@queues", nil)
     File.delete(HelloWorker::TEST_FILE) if File.exist?(HelloWorker::TEST_FILE)
   end
 
   should "daemonize" do
     begin
-      SweatShop.config['enable'] = true
-      SweatShop.logger = :silent
+      Sweatshop.config['enable'] = true
+      Sweatshop.logger = :silent
   
       HelloWorker.async_hello('Amos')
   
       worker = File.expand_path(File.dirname(__FILE__) + '/hello_worker')
-      sweatd = "#{File.dirname(__FILE__)}/../lib/sweat_shop/sweatd.rb"
+      sweatd = "#{File.dirname(__FILE__)}/../lib/sweatshop/sweatd.rb"
   
       `ruby #{sweatd} --worker-file #{worker} start`
       `ruby #{sweatd} stop`
@@ -39,9 +39,9 @@ class WorkerTest < Test::Unit::TestCase
 
   should "connect to fallback servers if the default one is down" do
     begin
-      SweatShop.logger = :silent
-      SweatShop.config['enable'] = true
-      SweatShop.config['default']['cluster'] =
+      Sweatshop.logger = :silent
+      Sweatshop.config['enable'] = true
+      Sweatshop.config['default']['cluster'] =
         [
          'localhost:5671', # invalid
          'localhost:5672'  # valid
@@ -53,7 +53,7 @@ class WorkerTest < Test::Unit::TestCase
       HelloWorker.queue.client = nil
 
       HelloWorker.stop
-      SweatShop.config['default']['cluster'] =
+      Sweatshop.config['default']['cluster'] =
         [
          'localhost:5671',# valid
          'localhost:5672' # invalid
