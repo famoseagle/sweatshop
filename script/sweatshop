@@ -7,7 +7,7 @@ if ARGV.include?('-d')
   root = File.expand_path(File.dirname(__FILE__) + '/..')
   ARGV << "--rails=#{root}"
 
-  system("ruby #{root}/vendor/gems/sweat_shop/lib/sweat_shop/sweatd.rb #{ARGV.join(' ')}")
+  system("ruby #{root}/vendor/gems/sweatshop/lib/sweatshop/sweatd.rb #{ARGV.join(' ')}")
   exit $?.exitstatus
 else
   puts "Loading Rails..."
