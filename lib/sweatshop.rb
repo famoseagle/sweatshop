@@ -81,7 +81,6 @@ module Sweatshop
 
   def stop
     @stop = true
-    queue.stop
   end
 
   def stop?
