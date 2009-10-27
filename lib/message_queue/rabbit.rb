@@ -74,6 +74,8 @@ module MessageQueue
             if i == (@opts['cluster'].size-1)
               raise e
             else
+              Sweatshop.log "\n*** Sweatshop failing over to #{@opts['cluster'][i+1]} ***"
+              Sweatshop.log "Error: #{e.message}\n#{e.backtrace.join("\n")}"
               next
             end
           end

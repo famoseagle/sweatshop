@@ -114,7 +114,7 @@ module Sweatshop
   end
 
   def queue_groups
-    @queue_groups ||= workers.collect{|w| w.queue_group} << 'default'
+    @queue_groups ||= (workers.collect{|w| w.queue_group.to_s} << 'default').uniq
   end
 
   def pp_sizes
@@ -132,18 +132,18 @@ module Sweatshop
       next unless qconfig['cluster']
       servers << qconfig['cluster']
     end
-    servers.flatten!
+    servers = servers.flatten.uniq
 
     servers.each do |server|
       puts "\nQueue sizes on #{server}"
       queue = MessageQueue::Rabbit.new('host' => server)
-      queue_groups.each do |group|
-        queues[group] = queue
+      workers.each do |worker|
+        worker.queue = queue
       end
       pp_sizes
       puts
     end
-    @queues = {}
+    workers.each{|w| w.queue = nil}
     nil
   end
 

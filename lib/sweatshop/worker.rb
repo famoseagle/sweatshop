@@ -85,8 +85,12 @@ module Sweatshop
       end
     end
 
+    def self.queue=(queue)
+      @queue = queue
+    end
+
     def self.queue
-      Sweatshop.queue(queue_group.to_s)
+      @queue ||= Sweatshop.queue(queue_group.to_s)
     end
 
     def self.workers
