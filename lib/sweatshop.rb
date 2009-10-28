@@ -79,6 +79,14 @@ module Sweatshop
     end
   end
 
+  def daemon?
+    @daemon
+  end
+
+  def daemonize
+    @daemon = true
+  end
+
   def stop
     @stop = true
   end

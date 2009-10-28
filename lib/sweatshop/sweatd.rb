@@ -52,6 +52,8 @@ module Sweatshop
     daemonize(:kill_timeout => 20) do
       workers = []
 
+      Sweatshop.daemonize
+
       if groups.any?
         workers += Sweatshop.workers_in_group(groups)
       end
