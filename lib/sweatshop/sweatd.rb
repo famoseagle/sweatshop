@@ -34,11 +34,14 @@ module Sweatshop
     end
 
     sig(:hup) do
-      puts "Received HUP"
-      Sweatshop.stop
-      remove_pid!
-      puts "Restarting sweatd with #{start_cmd}..."
-      `#{start_cmd}`        
+      begin
+        puts "Received HUP"
+        Sweatshop.stop
+      ensure
+        remove_pid!
+        puts "Restarting sweatd with #{start_cmd}..."
+        `#{start_cmd}`        
+      end
     end
     
     before do
