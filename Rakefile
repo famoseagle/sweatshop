@@ -9,11 +9,11 @@ begin
     s.name = "sweatshop"
     s.summary = %Q{Sweatshop is a simple asynchronous worker queue build on top of rabbitmq/ampq}
     s.email = "amos@geni.com"
-    s.homepage = "http://github.com/famoseagle/sweat-shop"
+    s.homepage = "http://github.com/famoseagle/sweatshop"
     s.description = "See summary"
     s.authors = ["Amos Elliston"]
     s.files =  FileList["[A-Z]*", "install.rb", "{lib,test,config,script}/**/*"]
-    s.add_dependency('famoseagle-carrot', '= 0.7.0')
+    s.add_dependency('carrot', '= 0.7.0')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
