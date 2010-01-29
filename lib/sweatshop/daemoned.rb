@@ -49,10 +49,6 @@ module Daemoned
           options[:ontop] = true
         end
 
-        opt.on('--instances=NUM', 'Allow multiple instances to run simultaneously? 0 for infinite. default: 1') do |value|
-          self.instances = value.to_i
-        end
-
         opt.on('--log-file=LOGFILE', 'Logfile to log to') do |value|
           options[:log_file] = File.expand_path(value)
         end
