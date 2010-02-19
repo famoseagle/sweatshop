@@ -44,6 +44,7 @@ module Sweatshop
           worker.stop
         end
         queue.stop
+        @stop.call if @stop.kind_of?(Proc)
         exit 
       end
       sleep 1 if wait
@@ -87,8 +88,12 @@ module Sweatshop
     @daemon = true
   end
 
-  def stop
-    @stop = true
+  def stop(&block)
+    if block_given?
+      @stop = block
+    else
+      @stop = true
+    end
   end
 
   def stop?

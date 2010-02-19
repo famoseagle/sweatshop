@@ -25,13 +25,6 @@ class SweatshopTest < Test::Unit::TestCase
     assert_equal "Hi, Amos", worker.hello('Amos')
   end
 
-  should "assign a uid" do
-    Sweatshop.logger = :silent
-    Sweatshop.config['enable'] = false
-    uid = HelloWorker.async_hello('Amos')
-    assert_not_nil uid
-  end
-
   should "have before task" do
     HelloWorker.before_task do
       "hello"
@@ -44,18 +37,6 @@ class SweatshopTest < Test::Unit::TestCase
       "goodbye"
     end
     assert_equal "goodbye", HelloWorker.after_task.call
-  end
-
-  should "exception handler" do
-    Sweatshop.logger = :silent
-
-    exception = nil
-    HelloWorker.on_exception do |e|
-      exception = e
-    end
-
-    HelloWorker.do_task(nil)
-    assert_equal NoMethodError, exception.class
   end
 
   should "chain before tasks" do

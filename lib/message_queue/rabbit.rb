@@ -44,7 +44,7 @@ module MessageQueue
         block.call
       rescue Carrot::AMQP::Server::ServerDown => e
         if not retried
-          puts "Error #{e.message}. Retrying..."
+          Sweatshop.log "Error #{e.message}. Retrying..."
           @client = nil
           retried = true
           retry

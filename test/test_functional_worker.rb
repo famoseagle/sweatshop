@@ -15,10 +15,7 @@ class WorkerTest < Test::Unit::TestCase
   end
 
   should "daemonize" do
-    begin
-      Sweatshop.config['enable'] = true
-      Sweatshop.logger = :silent
-  
+    enable_server do
       HelloWorker.async_hello('Amos')
   
       worker = File.expand_path(File.dirname(__FILE__) + '/hello_worker')
@@ -29,26 +26,19 @@ class WorkerTest < Test::Unit::TestCase
   
       File.delete('sweatd.log') if File.exist?('sweatd.log')
       assert_equal 'Hi, Amos', File.read(HelloWorker::TEST_FILE)
-  
-    rescue Exception => e
-      puts e.message
-      puts e.backtrace.join("\n")
-      fail "\n\n*** Functional test failed, is the rabbit server running on localhost? ***\n"
     end
   end
 
   should "connect to fallback servers if the default one is down" do
-    begin
-      Sweatshop.logger = :silent
-      Sweatshop.config['enable'] = true
+    enable_server do
       Sweatshop.config['default']['cluster'] =
         [
          'localhost:5671', # invalid
          'localhost:5672'  # valid
         ]
       HelloWorker.async_hello('Amos')
-  
-      assert_equal 'Amos', HelloWorker.dequeue[:args].first
+      task = HelloWorker.dequeue
+      assert_equal 'Amos', task[:args].first
 
       HelloWorker.queue.client = nil
 
@@ -61,12 +51,29 @@ class WorkerTest < Test::Unit::TestCase
   
       HelloWorker.async_hello('Amos')
       assert_equal 'Amos', HelloWorker.dequeue[:args].first
-  
+    end
+  end
+
+  should "exception handler" do
+    exception = nil
+    HelloWorker.on_exception do |e|
+      exception = e
+    end
+
+    HelloWorker.do_task(nil)
+    assert_equal NoMethodError, exception.class
+  end
+
+
+  def enable_server
+    Sweatshop.config['enable'] = true
+    Sweatshop.logger = :silent
+    begin
+      yield
     rescue Exception => e
       puts e.message
       puts e.backtrace.join("\n")
       fail "\n\n*** Functional test failed, is the rabbit server running on localhost? ***\n"
     end
   end
-
 end
