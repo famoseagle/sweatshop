@@ -82,6 +82,13 @@ module Sweatshop
       rescue Exception => e
         log("Caught Exception: #{e.message}, \n#{e.backtrace.join("\n")}")
         call_exception_handler(e)
+
+        # the only way to re-queue messages with rabbitmq is to close and reopen the connection
+        # putting a 'sleep 2' in here to give the administrator to fix peristent problems, otherwise
+        # we'll hit an infinite loop
+        #
+        queue.stop
+        sleep 2
       end
     end
 
