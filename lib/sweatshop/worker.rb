@@ -41,6 +41,10 @@ module Sweatshop
       @queue_name ||= self.to_s
     end
 
+    def self.flush_queue
+      queue.flush_all(queue_name)
+    end
+
     def self.delete_queue
       queue.delete(queue_name)
     end

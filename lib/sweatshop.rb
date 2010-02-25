@@ -130,6 +130,12 @@ module Sweatshop
     @queue_groups ||= (workers.collect{|w| w.queue_group.to_s} << 'default').uniq
   end
 
+  def flush_all_queues
+    workers.each do |worker|
+      worker.flush_queue
+    end
+  end
+
   def pp_sizes
     max_width = workers.collect{|w| w.to_s.size}.max
     puts '-' * (max_width + 10)

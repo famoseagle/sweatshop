@@ -38,6 +38,12 @@ module MessageQueue
       end
     end
 
+    def flush_all(queue)
+      send_command do
+        client.queue(queue).purge
+      end
+    end
+
     def send_command(&block)
       retried = false
       begin

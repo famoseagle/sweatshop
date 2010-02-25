@@ -8,5 +8,6 @@ module MessageQueue
     def delete(queue);        end
     def client;               end
     def stop;                 end
+    def flush_all(queue);     end
   end
 end
