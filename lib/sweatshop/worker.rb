@@ -91,8 +91,11 @@ module Sweatshop
         # putting a 'sleep 2' in here to give the administrator to fix peristent problems, otherwise
         # we'll hit an infinite loop
         #
-        queue.stop
-        sleep 2
+        # THIS CODE IS PROBLEMATIC --- we need to put these tasks into a 'failed' queue so we don't run into infinite loops
+        # will just 'confirm' for now
+        #queue.stop
+        #sleep 2
+        confirm
       end
     end
 
