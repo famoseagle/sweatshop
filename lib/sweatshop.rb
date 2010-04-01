@@ -166,6 +166,10 @@ module Sweatshop
     nil
   end
 
+  def enabled?
+    !!config['enable']
+  end
+
   def log(msg)
     return if logger == :silent
     logger ? logger.debug(msg) : puts(msg)
