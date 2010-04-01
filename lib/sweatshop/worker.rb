@@ -8,11 +8,9 @@ module Sweatshop
 
     def self.method_missing(method, *args, &block)
       if method.to_s =~ /^async_(.*)/
-        method        = $1
-        expected_args = instance.method(method).arity
-        if expected_args != args.size
-          raise ArgumentError.new("#{method} expects #{expected_args} arguments")
-        end
+        method = $1
+        check_arity!(instance.method(method), args)
+
         return instance.send(method, *args) unless async?
 
         uid  = ::Digest::MD5.hexdigest("#{name}:#{method}:#{args}:#{Time.now.to_f}")
