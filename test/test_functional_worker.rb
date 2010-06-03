@@ -1,6 +1,6 @@
-require File.dirname(__FILE__) + '/../lib/sweatshop'
-require File.dirname(__FILE__) + '/test_helper'
-require File.dirname(__FILE__) + '/hello_worker'
+require File.expand_path(File.dirname(__FILE__) + '/../lib/sweatshop')
+require File.expand_path(File.dirname(__FILE__) + '/test_helper'     )
+require File.expand_path(File.dirname(__FILE__) + '/hello_worker'    )
 
 class WorkerTest < Test::Unit::TestCase
 
