@@ -7,47 +7,35 @@ module MessageQueue
     end
 
     def delete(queue)
-      send_command do
-        client.queue(queue).delete
-      end
+      cmd(name, :delete)
     end
 
     def queue_size(queue)
-      send_command do
-        client.queue(queue).message_count
-      end
+      cmd(queue, :message_count)
     end
 
     def enqueue(queue, data)
-      send_command do
-        client.queue(queue, :durable => true).publish(Marshal.dump(data), :persistent => true)
-      end
+      cmd(queue, :publish, Marshal.dump(data), :persistent => true)
     end
 
     def dequeue(queue)
-      send_command do
-        task = client.queue(queue).pop(:ack => true)
-        return unless task
-        Marshal.load(task)
-      end
+      task = cmd(queue, :pop, :ack => true)
+      return unless task
+      Marshal.load(task)
     end
 
     def confirm(queue)
-      send_command do
-        client.queue(queue).ack
-      end
+      cmd(queue, :ack)
     end
 
     def flush_all(queue)
-      send_command do
-        client.queue(queue).purge
-      end
+      cmd(queue, :purge)
     end
 
-    def send_command(&block)
+    def cmd(queue, command, *args)
       retried = false
       begin
-        block.call
+        client.queue(queue, :durable => true).send(command, *args)
       rescue Carrot::AMQP::Server::ServerDown => e
         if not retried
           Sweatshop.log "Error #{e.message}. Retrying..."
