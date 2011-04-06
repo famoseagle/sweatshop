@@ -7,7 +7,7 @@ module MessageQueue
     end
 
     def delete(queue)
-      cmd(name, :delete)
+      cmd(queue, :delete)
     end
 
     def queue_size(queue)
