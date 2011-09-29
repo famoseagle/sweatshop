@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/metaid'
 module Sweatshop
   class Worker
     def self.inherited(subclass)
-      self.workers << subclass
+      Sweatshop.register_worker(subclass)
     end
 
     def self.method_missing(method, *args, &block)
