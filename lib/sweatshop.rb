@@ -107,7 +107,7 @@ module Sweatshop
   end
 
   def queue_sizes
-    workers.inject([]) do |all, worker|
+    registered__workers.inject([]) do |all, worker|
       all << [worker, worker.queue_size]
       all
     end
