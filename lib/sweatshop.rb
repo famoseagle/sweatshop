@@ -12,7 +12,7 @@ module Sweatshop
   extend self
 
   def register_worker(klass)
-    registered_workers << klass
+    registered_workers << klass unless registered_workers.include?(klass)
   end
 
   def registered_workers
