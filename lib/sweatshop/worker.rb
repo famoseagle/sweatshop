@@ -78,6 +78,7 @@ module Sweatshop
 
     def self.do_task(task)
       begin
+        task.merge!( :worker_class => self )
         call_before_task(task)
 
         queued_at = task[:queued_at] ? "(queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" : ''
