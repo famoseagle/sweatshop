@@ -8,23 +8,26 @@ module Sweatshop
 
     def self.method_missing(method, *args, &block)
       if method.to_s =~ /^async_(.*)/
-        method = $1
-        check_arity!(instance.method(method), args)
-
-        return instance.send(method, *args) unless async?
-
-        uid  = ::Digest::MD5.hexdigest("#{name}:#{method}:#{args}:#{Time.now.to_f}")
-        task = {:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i}
-
-        log("Putting #{uid} on #{queue_name}")
-        enqueue(task)
-
-        uid
+        send_async($1, *args)
       elsif instance.respond_to?(method)
         instance.send(method, *args)
       else
         super
       end
+    end
+
+    def self.send_async(method, *args)
+      check_arity!(instance.method(method), args)
+      
+      return instance.send(method, *args) unless async?
+      
+      uid  = ::Digest::MD5.hexdigest("#{name}:#{method}:#{args}:#{Time.now.to_f}")
+      task = {:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i}
+      
+      log("Putting #{uid} on #{queue_name}")
+      enqueue(task)
+      
+      uid
     end
 
     def self.async?
