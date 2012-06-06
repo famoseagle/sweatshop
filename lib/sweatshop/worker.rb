@@ -3,28 +3,31 @@ require File.dirname(__FILE__) + '/metaid'
 module Sweatshop
   class Worker
     def self.inherited(subclass)
-      self.workers << subclass
+      Sweatshop.register_worker(subclass)
     end
 
     def self.method_missing(method, *args, &block)
       if method.to_s =~ /^async_(.*)/
-        method = $1
-        check_arity!(instance.method(method), args)
-
-        return instance.send(method, *args) unless async?
-
-        uid  = ::Digest::MD5.hexdigest("#{name}:#{method}:#{args}:#{Time.now.to_f}")
-        task = {:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i}
-
-        log("Putting #{uid} on #{queue_name}")
-        enqueue(task)
-
-        uid
+        send_async($1, *args)
       elsif instance.respond_to?(method)
         instance.send(method, *args)
       else
         super
       end
+    end
+
+    def self.send_async(method, *args)
+      check_arity!(instance.method(method), args)
+      
+      return instance.send(method, *args) unless async?
+      
+      uid  = ::Digest::MD5.hexdigest("#{name}:#{method}:#{args}:#{Time.now.to_f}")
+      task = {:args => args, :method => method, :uid => uid, :queued_at => Time.now.to_i}
+      
+      log("Putting #{uid} on #{queue_name}")
+      enqueue(task)
+      
+      uid
     end
 
     def self.async?
@@ -75,6 +78,7 @@ module Sweatshop
 
     def self.do_task(task)
       begin
+        task.merge!( :worker_class => self )
         call_before_task(task)
 
         queued_at = task[:queued_at] ? "(queued #{Time.at(task[:queued_at]).strftime('%Y/%m/%d %H:%M:%S')})" : ''

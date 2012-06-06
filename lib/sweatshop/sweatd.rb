@@ -67,12 +67,13 @@ module Sweatshop
         worker_str = workers.join(',')
         puts "Starting #{worker_str}..." 
         $0 = "Sweatd: #{worker_str}"
-        Sweatshop.do_tasks(workers)
+        Sweatshop.workers = workers
       else
         puts "Starting all workers..." 
         $0 = 'Sweatd: all'
-        Sweatshop.do_all_tasks
       end
+
+      Sweatshop.do_tasks
     end
 
   end

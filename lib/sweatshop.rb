@@ -11,8 +11,16 @@ require 'sweatshop/worker'
 module Sweatshop
   extend self
 
+  def register_worker(klass)
+    registered_workers << klass unless registered_workers.include?(klass)
+  end
+
+  def registered_workers
+    @registered_workers ||= []
+  end
+
   def workers
-    @workers ||= []
+    @workers ||= registered_workers
   end
 
   def workers=(workers)
@@ -22,15 +30,15 @@ module Sweatshop
   def workers_in_group(groups)
     groups = [groups] unless groups.is_a?(Array)
     if groups.include?(:all)
-      workers
+      registered_workers
     else
-      workers.select do |worker|
+      registered_workers.select do |worker|
         groups.include?(worker.queue_group)
       end
     end
   end
 
-  def do_tasks(workers)
+  def do_tasks
     loop do
       wait = true
       workers.each do |worker|
@@ -52,15 +60,13 @@ module Sweatshop
   end
 
   def do_all_tasks
-    do_tasks(
-      workers_in_group(:all)
-    )
+    Sweatshop.workers = registered_workers
+    do_tasks
   end
 
   def do_default_tasks
-    do_tasks(
-      workers_in_group(:default)
-    )
+    Sweatshop.workers = workers_in_group(:default)
+    do_tasks
   end
 
   def config
@@ -101,7 +107,7 @@ module Sweatshop
   end
 
   def queue_sizes
-    workers.inject([]) do |all, worker|
+    registered_workers.inject([]) do |all, worker|
       all << [worker, worker.queue_size]
       all
     end
