@@ -195,5 +195,7 @@ module Sweatshop
 end
 
 if defined?(RAILS_ROOT)
-  Dir.glob(RAILS_ROOT + '/app/workers/*.rb').each{|worker| require_or_load worker }
+  Dir.glob(RAILS_ROOT + '/app/workers/**/*.rb').each do |worker|
+    require_or_load worker unless File.directory?(worker)
+  end
 end
